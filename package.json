@@ -1,0 +1,76 @@
+{
+    "name": "@signalsafe/tree-spec-editor-react",
+    "version": "0.1.2",
+    "type": "module",
+    "description": "Headless React canvas for the SignalSafe TreeSpec graph editor (React Flow shell, no UI library).",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SignalSafeSoftware/tree-spec-editor-react.git"
+    },
+    "bugs": {
+        "url": "https://github.com/SignalSafeSoftware/tree-spec-editor-react/issues"
+    },
+    "homepage": "https://github.com/SignalSafeSoftware/tree-spec-editor-react#readme",
+    "keywords": [
+        "tree-spec",
+        "tree-spec-editor",
+        "react-flow",
+        "react",
+        "graph-editor",
+        "decision-tree",
+        "headless-ui",
+        "typescript",
+        "signalsafe"
+    ],
+    "sideEffects": false,
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "default": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "engines": {
+        "node": ">=18"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "build": "tsc -p tsconfig.build.json",
+        "typecheck": "tsc --noEmit",
+        "pack:local": "npm pack --pack-destination ../../dist/reusable-npm",
+        "prepublishOnly": "npm run build",
+        "prepare": "npm run build",
+        "test": "vitest run",
+        "test:monorepo": "cd ../../frontend && yarn vitest run --config vitest.tree-spec-editor-react.config.ts"
+    },
+    "dependencies": {
+        "@signalsafe/tree-spec": "^0.3.1",
+        "@signalsafe/tree-spec-editor-core": "^0.1.2"
+    },
+    "peerDependencies": {
+        "react": "^18.0.0",
+        "react-dom": "^18.0.0",
+        "reactflow": "^11.0.0"
+    },
+    "devDependencies": {
+        "@types/react": "^18.2.66",
+        "@types/react-dom": "^18.2.22",
+        "@types/react-test-renderer": "^18.3.0",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "react-test-renderer": "^18.3.1",
+        "reactflow": "^11.11.4",
+        "typescript": "^5.4.2",
+        "vitest": "^3.2.4"
+    }
+}
