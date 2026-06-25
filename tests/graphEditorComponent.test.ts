@@ -259,8 +259,8 @@ describe('TreeSpecGraphEditor', () => {
         expect(root.findByProps({ title: '0 errors, 0 warnings, 1 info' })).toBeTruthy();
         expect(root.findByProps({ 'data-testid': 'edge-t1' }).props['data-stroke-dasharray']).toBe('6 4');
         expect(root.findByProps({ 'data-testid': 'edge-t2' }).props['data-selected']).toBe('true');
-        expect(root.findAll((node) => node.type === 'em' && node.children.includes('(empty prompt)')).length).toBe(1);
-        expect(root.findAll((node) => node.type === 'em' && node.children.includes('No choices')).length).toBe(1);
+        expect(root.findAll((node) => node.type === 'em' && node.children.includes('(empty prompt)'))).toHaveLength(1);
+        expect(root.findAll((node) => node.type === 'em' && node.children.includes('No choices'))).toHaveLength(1);
         expect(root.findAll((node) => node.type === 'div' && node.children.includes('END')).length).toBeGreaterThan(0);
     });
 
@@ -308,7 +308,7 @@ describe('TreeSpecGraphEditor', () => {
                 node.props.className.includes('graph-editor-canvas-node') &&
                 node.props.className.includes('bg-primary-subtle'),
         );
-        expect(nodeCard.length).toBe(0);
+        expect(nodeCard).toHaveLength(0);
 
         const focusedChoice = renderer!.root.findAll(
             (node) =>
@@ -317,7 +317,7 @@ describe('TreeSpecGraphEditor', () => {
                 node.props.className.includes('graph-editor-canvas-choice-selected') &&
                 node.props.className.includes('bg-primary-subtle'),
         );
-        expect(focusedChoice.length).toBe(1);
+        expect(focusedChoice).toHaveLength(1);
 
         const choiceButtons = focusedChoice[0].findAllByType('button');
         const selectButton = choiceButtons.find(
@@ -413,7 +413,7 @@ describe('TreeSpecGraphEditor', () => {
         const root = renderer!.root;
         expect(root.findByProps({ 'data-testid': 'node-start' }).props['data-selected']).toBe('true');
         expect(root.findByProps({ 'data-testid': 'edge-edge-without-choice' }).props['data-stroke-dasharray']).toBe('');
-        expect(root.findAll((node) => node.type === 'em' && node.children.includes('No choices')).length).toBe(1);
+        expect(root.findAll((node) => node.type === 'em' && node.children.includes('No choices'))).toHaveLength(1);
         expect(root.findByProps({ 'data-testid': 'edge-edge-without-choice' }).children.join('')).toContain(
             'fallback-choice  →  END (at_risk)'
         );
@@ -454,7 +454,7 @@ describe('TreeSpecGraphEditor', () => {
                 node.props.className.includes('graph-editor-node-text-wrap') &&
                 node.children?.includes(longPrompt),
         );
-        expect(promptCards.length).toBe(1);
+        expect(promptCards).toHaveLength(1);
 
         const card = renderer!.root.findAll(
             (node) =>
@@ -491,7 +491,7 @@ describe('TreeSpecGraphEditor', () => {
                 node.props.className.includes('graph-editor-node-text-truncate') &&
                 node.children?.includes(longPrompt),
         );
-        expect(truncatedPrompt.length).toBe(1);
+        expect(truncatedPrompt).toHaveLength(1);
     });
 
     it('restores END position and viewport from _meta.graph_editor', async () => {
@@ -1146,7 +1146,7 @@ describe('TreeSpecGraphEditor', () => {
         const duplicateItem = renderer!.root.findAll(
             (node) => node.type === 'button' && node.props.children === 'Duplicate node',
         );
-        expect(duplicateItem.length).toBe(1);
+        expect(duplicateItem).toHaveLength(1);
         await act(async () => {
             duplicateItem[0].props.onClick();
         });
@@ -1208,7 +1208,7 @@ describe('TreeSpecGraphEditor', () => {
             let menuItems = renderer!.root.findAll(
                 (node) => node.type === 'button' && node.props.children === 'Duplicate node',
             );
-            expect(menuItems.length).toBe(1);
+            expect(menuItems).toHaveLength(1);
 
             await act(async () => {
                 mockDocument.dispatchEvent({ type: 'keydown', key: 'Escape' } as KeyboardEvent);
@@ -1217,7 +1217,7 @@ describe('TreeSpecGraphEditor', () => {
             menuItems = renderer!.root.findAll(
                 (node) => node.type === 'button' && node.props.children === 'Duplicate node',
             );
-            expect(menuItems.length).toBe(0);
+            expect(menuItems).toHaveLength(0);
 
             await act(async () => {
                 reactFlowState.latestProps.onNodeContextMenu(
@@ -1228,7 +1228,7 @@ describe('TreeSpecGraphEditor', () => {
             menuItems = renderer!.root.findAll(
                 (node) => node.type === 'button' && node.props.children === 'Duplicate node',
             );
-            expect(menuItems.length).toBe(1);
+            expect(menuItems).toHaveLength(1);
 
             await act(async () => {
                 mockDocument.dispatchEvent({ type: 'pointerdown' } as Event);
@@ -1236,7 +1236,7 @@ describe('TreeSpecGraphEditor', () => {
             menuItems = renderer!.root.findAll(
                 (node) => node.type === 'button' && node.props.children === 'Duplicate node',
             );
-            expect(menuItems.length).toBe(0);
+            expect(menuItems).toHaveLength(0);
         } finally {
             (globalThis as { document?: Document }).document = originalDocument;
         }
@@ -1686,7 +1686,7 @@ describe('TreeSpecGraphEditor', () => {
         const choiceList = startNodeBtn.findAll(
             (node) => node.type === 'ul' && node.props['aria-label'] === 'Node choices',
         );
-        expect(choiceList.length).toBe(1);
+        expect(choiceList).toHaveLength(1);
 
         await act(async () => {
             choiceList[0].props.onDragOver({
@@ -1703,7 +1703,7 @@ describe('TreeSpecGraphEditor', () => {
                 node.props.className.includes(CHOICE_DROP_APPEND_CLASS) &&
                 node.props.className.includes(CHOICE_DROP_TARGET_CLASS),
         );
-        expect(appendZone.length).toBe(1);
+        expect(appendZone).toHaveLength(1);
 
         await act(async () => {
             choiceList[0].props.onDrop({
