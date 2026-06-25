@@ -942,7 +942,7 @@ describe('useTreeSpecEditor', () => {
             await act(async () => {
                 latest.current!.actions.pasteCopiedNode();
             });
-            expect(Object.keys(latest.current?.tree?.nodes ?? {}).length).toBe(beforeCount + 1);
+            expect(Object.keys(latest.current?.tree?.nodes ?? {})).toHaveLength(beforeCount + 1);
         });
 
         it('duplicateNodeById clones a node and selects the copy', async () => {
@@ -954,7 +954,7 @@ describe('useTreeSpecEditor', () => {
                 newId = latest.current!.actions.duplicateNodeById('n1');
             });
             expect(newId).toBeDefined();
-            expect(Object.keys(latest.current?.tree?.nodes ?? {}).length).toBe(beforeCount + 1);
+            expect(Object.keys(latest.current?.tree?.nodes ?? {})).toHaveLength(beforeCount + 1);
             expect(latest.current?.selection).toEqual({ kind: GRAPH_SELECTION_KIND.NODE, id: newId });
         });
 
@@ -1086,7 +1086,7 @@ describe('useTreeSpecEditor', () => {
             await act(async () => {
                 latest.current!.actions.addChoice();
             });
-            expect(latest.current?.selectedNode?.choices?.length).toBe(beforeCount + 1);
+            expect(latest.current?.selectedNode?.choices ?? []).toHaveLength(beforeCount + 1);
         });
 
         it('deleteChoice removes a choice from the selected node', async () => {
@@ -1338,7 +1338,7 @@ describe('useTreeSpecEditor', () => {
             await act(async () => {
                 keyboard.dispatchKey({ key: 'd', ctrlKey: true });
             });
-            expect(Object.keys(latest.current?.tree?.nodes ?? {}).length).toBe(beforeDuplicateCount + 1);
+            expect(Object.keys(latest.current?.tree?.nodes ?? {})).toHaveLength(beforeDuplicateCount + 1);
 
             await act(async () => {
                 latest.current!.actions.setSelection({ kind: GRAPH_SELECTION_KIND.NODE, id: 'n1' });
@@ -1366,7 +1366,7 @@ describe('useTreeSpecEditor', () => {
             await act(async () => {
                 keyboard.dispatchKey({ key: 'v', ctrlKey: true });
             });
-            expect(Object.keys(latest.current?.tree?.nodes ?? {}).length).toBe(beforePasteCount + 1);
+            expect(Object.keys(latest.current?.tree?.nodes ?? {})).toHaveLength(beforePasteCount + 1);
 
             await act(async () => {
                 latest.current!.actions.setSelection({ kind: GRAPH_SELECTION_KIND.NODE, id: 'n1' });
@@ -1425,7 +1425,7 @@ describe('useTreeSpecEditor', () => {
             await act(async () => {
                 keyboard.dispatchKey({ key: 'Delete' });
             });
-            expect(latest.current!.tree!.transitions.length).toBe(before - 1);
+            expect(latest.current!.tree!.transitions).toHaveLength(before - 1);
         });
 
         it('ignores keyboard shortcuts in text fields and when preview is unavailable', async () => {

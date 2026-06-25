@@ -43,8 +43,7 @@ export function useEditorSelection(tree: EditorTree | null): UseEditorSelectionR
         (next: GraphSelection) => {
             setSelection(next);
             if (next.kind === GRAPH_SELECTION_KIND.EDGE && next.id && tree) {
-                const edge = tree.transitions.find((t) => t.id === next.id);
-                if (!edge) return;
+                if (!tree.transitions.some((t) => t.id === next.id)) return;
             }
             const { focusNodeId: nextFocusNodeId, focusChoiceId: nextFocusChoiceId } =
                 resolveGraphSelectionFocus(next, tree);
