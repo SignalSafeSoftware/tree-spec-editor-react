@@ -127,6 +127,11 @@ npm run typecheck
 
 See [SECURITY.md](./SECURITY.md). Host applications must authenticate users, authorize edits, and validate TreeSpec JSON server-side before publish.
 
+## Changelog and releases
+
+- [CHANGELOG.md](./CHANGELOG.md)
+- [RELEASING.md](./RELEASING.md)
+
 ## Related packages
 
 - [`@signalsafe/tree-spec-editor-core`](https://github.com/SignalSafeSoftware/tree-spec-editor-core) — framework-agnostic editor helpers.
