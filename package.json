@@ -23,7 +23,9 @@
         "typescript",
         "signalsafe"
     ],
-    "sideEffects": false,
+    "sideEffects": [
+        "**/*.css"
+    ],
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
@@ -41,6 +43,7 @@
     "engines": {
         "node": ">=18"
     },
+    "packageManager": "npm@11.13.0",
     "publishConfig": {
         "access": "public"
     },
