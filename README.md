@@ -116,13 +116,13 @@ Pass `contextualZoom={false}` to disable automatic viewport fitting.
 
 ## Development
 
-`npm run build` uses `tsconfig.build.json` and resolves `@signalsafe/*` from `node_modules`. Ecosystem sibling `paths` in `tsconfig.json` apply to local typecheck/tests only.
+`yarn build` uses `tsconfig.build.json` and resolves `@signalsafe/*` from `node_modules`. Ecosystem sibling `paths` in `tsconfig.json` apply to local typecheck/tests only.
 
 ```bash
-npm install
-npm run build
-npm test
-npm run typecheck
+yarn install
+yarn build
+yarn test
+yarn typecheck
 ```
 
 ## Security
