@@ -20,4 +20,8 @@ describe('@signalsafe/tree-spec-editor-react barrel', () => {
         expect(surface).not.toContain('ToolbarPanel');
         expect(surface).not.toContain('getIssueSeverityBadgeClass');
     });
+
+    it('documents the documented public hook export', () => {
+        expect(packageExports.useTreeSpecEditor.name).toBe('useTreeSpecEditor');
+    });
 });
