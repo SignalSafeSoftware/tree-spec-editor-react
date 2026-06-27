@@ -6,7 +6,13 @@ Headless **React + React Flow** layer for the SignalSafe TreeSpec graph editor: 
 |---|---|
 | **npm** | `@signalsafe/tree-spec-editor-react` |
 | **GitHub** | [SignalSafeSoftware/tree-spec-editor-react](https://github.com/SignalSafeSoftware/tree-spec-editor-react) |
-| **Peer deps** | `react`, `react-dom`, `reactflow` (^18 / ^11) |
+| **Peer deps** | `react`, `react-dom`, `reactflow` (^18 / ^11) — **no UI library required** |
+
+## UI-kit agnostic canvas
+
+The React Flow canvas uses **semantic HTML** and **`graph-editor-*` class hooks** only. It does **not** require Bootstrap CSS, Bootstrap Icons, or any component library.
+
+**Host applications own styling.** Map `graph-editor-*` in your theme, or pass `className` on `TreeSpecGraphEditor` for layout/sizing. See [docs/UI_KIT_AGNOSTIC_CANVAS.md](./docs/UI_KIT_AGNOSTIC_CANVAS.md).
 
 ## What this package does
 
@@ -16,7 +22,7 @@ Headless **React + React Flow** layer for the SignalSafe TreeSpec graph editor: 
 
 ## What this package does not do
 
-- Sidebar panels, modals, toolbars, or Bootstrap chrome — use `@signalsafe/tree-spec-editor` or your own UI shell.
+- Sidebar panels, modals, toolbars, or UI-kit chrome — use `@signalsafe/tree-spec-editor` or your own UI shell.
 - Routing, HTTP, authentication, or persistence — host app provides adapter implementations.
 - Wire compile/publish to a backend without your adapter code.
 
@@ -36,7 +42,7 @@ Ensure your app loads React Flow styles, for example:
 import "reactflow/dist/style.css";
 ```
 
-If you use `@signalsafe/tree-spec-editor` (Bootstrap shell), the canvas still comes from this package — consumers may need the CSS import in the app entry when tree-shaking.
+If you use `@signalsafe/tree-spec-editor` as the authoring shell, map `graph-editor-*` canvas hooks in host CSS — Bootstrap is optional and host-owned.
 
 ## Quick start
 
@@ -76,7 +82,7 @@ export function ExampleCanvas() {
         <TreeSpecGraphEditor
             tree={tree}
             onChange={setTree}
-            className="h-[60vh] border rounded"
+            className="graph-editor-canvas-root my-canvas-host"
         />
     );
 }
@@ -102,7 +108,7 @@ Import from `@signalsafe/tree-spec-editor-react` only (no subpath exports).
 | Wire | `@signalsafe/tree-spec` |
 | Editor model | `@signalsafe/tree-spec-editor-core` |
 | **React canvas (this package)** | `@signalsafe/tree-spec-editor-react` |
-| Bootstrap shell | `@signalsafe/tree-spec-editor` |
+| Authoring shell | `@signalsafe/tree-spec-editor` |
 
 ## Canvas selection behavior
 
