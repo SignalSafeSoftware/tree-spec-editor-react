@@ -4,6 +4,8 @@ Standalone repository: [SignalSafeSoftware/tree-spec-editor-react](https://githu
 
 **Depends on:** `@signalsafe/tree-spec`, `@signalsafe/tree-spec-editor-core`. **Peer deps:** `react`, `react-dom`, `reactflow`.
 
+**Release note (0.2.0):** Publish this package **before** `@signalsafe/tree-spec-editor@0.3.0`, which depends on `^0.2.0` of this canvas package. See [docs/UI_KIT_AGNOSTIC_CANVAS.md](./docs/UI_KIT_AGNOSTIC_CANVAS.md).
+
 ## CI publish policy
 
 - **Checks and tests** run on every pull request.

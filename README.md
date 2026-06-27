@@ -145,4 +145,4 @@ See [SECURITY.md](./SECURITY.md). Host applications must authenticate users, aut
 ## Related packages
 
 - [`@signalsafe/tree-spec-editor-core`](https://github.com/SignalSafeSoftware/tree-spec-editor-core) — framework-agnostic editor helpers.
-- [`@signalsafe/tree-spec-editor`](https://github.com/SignalSafeSoftware/tree-spec-editor) — full Bootstrap UI shell.
+- [`@signalsafe/tree-spec-editor`](https://github.com/SignalSafeSoftware/tree-spec-editor) — UI-kit agnostic authoring shell (panels, modals, toolbar).
