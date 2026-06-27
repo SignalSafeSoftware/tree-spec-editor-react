@@ -4,11 +4,13 @@ import { TestRenderer, act } from './reactTestRenderer';
 import TreeSpecGraphEditor from '../src/TreeSpecGraphEditor';
 import { END_NODE_ID, DEFAULT_GRAPH_NODE_WIDTH, GRAPH_SELECTION_KIND, type EditorTree, type GraphEditorIssue } from '@signalsafe/tree-spec-editor-core';
 import {
+    CANVAS_CLASS,
     CANVAS_NODE_SELECTED_CLASS,
     CHOICE_DRAG_HANDLE_CLASS,
     CHOICE_DROP_APPEND_CLASS,
     CHOICE_DROP_TARGET_CLASS,
 } from '../src/canvas/constants';
+import { EDITOR_CANVAS_ROOT } from '../src/ui/editorClasses';
 import { collectBootstrapViolations } from './bootstrapClassDenylist';
 
 const reactFlowState = {
@@ -263,6 +265,51 @@ describe('TreeSpecGraphEditor', () => {
         expect(root.findAll((node) => node.type === 'em' && node.children.includes('(empty prompt)'))).toHaveLength(1);
         expect(root.findAll((node) => node.type === 'em' && node.children.includes('No choices'))).toHaveLength(1);
         expect(root.findAll((node) => node.type === 'div' && node.children.includes('END')).length).toBeGreaterThan(0);
+    });
+
+    it('applies default graph-editor canvas hooks when className is omitted', async () => {
+        await act(async () => {
+            renderer = TestRenderer.create(
+                React.createElement(TreeSpecGraphEditor, {
+                    tree: createTree(),
+                    onChange: vi.fn(),
+                }),
+            );
+        });
+
+        const canvasRoot = renderer!.root.find(
+            (node) =>
+                node.type === 'div' &&
+                typeof node.props.className === 'string' &&
+                node.props.className.includes(CANVAS_CLASS),
+        );
+        const className = canvasRoot.props.className as string;
+        expect(className).toContain(EDITOR_CANVAS_ROOT);
+        expect(className).toContain(CANVAS_CLASS);
+        expect(collectBootstrapViolations(renderer!.root)).toEqual([]);
+    });
+
+    it('merges a host className with the canvas hook without Bootstrap classes', async () => {
+        await act(async () => {
+            renderer = TestRenderer.create(
+                React.createElement(TreeSpecGraphEditor, {
+                    tree: createTree(),
+                    onChange: vi.fn(),
+                    className: 'host-canvas-shell',
+                }),
+            );
+        });
+
+        const canvasRoot = renderer!.root.find(
+            (node) =>
+                node.type === 'div' &&
+                typeof node.props.className === 'string' &&
+                node.props.className.includes(CANVAS_CLASS),
+        );
+        const className = canvasRoot.props.className as string;
+        expect(className).toContain(CANVAS_CLASS);
+        expect(className).toContain('host-canvas-shell');
+        expect(collectBootstrapViolations(renderer!.root)).toEqual([]);
     });
 
     it('renders warning-only nodes with the warning border class', async () => {
