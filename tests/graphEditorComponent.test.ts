@@ -9,6 +9,7 @@ import {
     CHOICE_DROP_APPEND_CLASS,
     CHOICE_DROP_TARGET_CLASS,
 } from '../src/canvas/constants';
+import { collectBootstrapViolations } from './bootstrapClassDenylist';
 
 const reactFlowState = {
     latestProps: null as any,
@@ -279,7 +280,7 @@ describe('TreeSpecGraphEditor', () => {
             (node) =>
                 node.type === 'div' &&
                 typeof node.props.className === 'string' &&
-                node.props.className.includes('border-warning')
+                node.props.className.includes('graph-editor-canvas-node--border-warning')
         );
 
         expect(warningCards.length).toBeGreaterThan(0);
@@ -306,7 +307,7 @@ describe('TreeSpecGraphEditor', () => {
                 node.type === 'div' &&
                 typeof node.props.className === 'string' &&
                 node.props.className.includes('graph-editor-canvas-node') &&
-                node.props.className.includes('bg-primary-subtle'),
+                node.props.className.includes('graph-editor-canvas__selected'),
         );
         expect(nodeCard).toHaveLength(0);
 
@@ -315,7 +316,7 @@ describe('TreeSpecGraphEditor', () => {
                 node.type === 'div' &&
                 typeof node.props.className === 'string' &&
                 node.props.className.includes('graph-editor-canvas-choice-selected') &&
-                node.props.className.includes('bg-primary-subtle'),
+                node.props.className.includes('graph-editor-canvas__selected'),
         );
         expect(focusedChoice).toHaveLength(1);
 
@@ -534,7 +535,7 @@ describe('TreeSpecGraphEditor', () => {
             (n) =>
                 n.type === 'div' &&
                 typeof n.props.className === 'string' &&
-                n.props.className.includes('bg-primary-subtle'),
+                n.props.className.includes('graph-editor-canvas__selected'),
         );
         expect(highlighted.length).toBeGreaterThan(0);
     });
@@ -1741,5 +1742,49 @@ describe('TreeSpecGraphEditor', () => {
             reactFlowState.latestProps.onEdgesDelete([]);
         });
         expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('does not emit Bootstrap CSS class tokens in rendered canvas markup', async () => {
+        await act(async () => {
+            renderer = TestRenderer.create(
+                React.createElement(TreeSpecGraphEditor, {
+                    tree: createTree(),
+                    issues: createIssues(),
+                    onChange: vi.fn(),
+                    selected: { kind: 'node', id: 'start' },
+                    focusChoiceId: 'c2',
+                }),
+            );
+        });
+
+        expect(collectBootstrapViolations(renderer!.root)).toEqual([]);
+    });
+
+    it('uses graph-editor badge and list hooks on canvas nodes', async () => {
+        await act(async () => {
+            renderer = TestRenderer.create(
+                React.createElement(TreeSpecGraphEditor, {
+                    tree: createTree(),
+                    issues: createIssues(),
+                    onChange: vi.fn(),
+                }),
+            );
+        });
+
+        const root = renderer!.root;
+        expect(
+            root.findAll(
+                (node) =>
+                    typeof node.props.className === 'string' &&
+                    node.props.className.includes('graph-editor-badge--danger'),
+            ).length,
+        ).toBeGreaterThan(0);
+        expect(
+            root.findAll(
+                (node) =>
+                    typeof node.props.className === 'string' &&
+                    node.props.className.includes('graph-editor-list'),
+            ).length,
+        ).toBeGreaterThan(0);
     });
 });

@@ -7,7 +7,16 @@ import {
     CHOICE_DROP_TARGET_CLASS,
 } from '../canvas/constants';
 import { type GraphEditorCanvasContextValue } from '../GraphEditorCanvasContext';
-import { joinClasses } from '../utils/joinClasses';
+import {
+    EDITOR_LIST_FLUSH,
+    EDITOR_LIST_ITEM_EMPTY,
+    EDITOR_MIN_W_0,
+    EDITOR_MUTED,
+    EDITOR_SPACING_PX_2,
+    EDITOR_SPACING_PY_2,
+    EDITOR_TEXT_SM,
+    joinClasses,
+} from '../ui/editorClasses';
 import { ChoiceCanvasRow } from './ChoiceCanvasRow';
 
 export function PromptNodeChoicesList({
@@ -48,7 +57,7 @@ export function PromptNodeChoicesList({
 
     return (
         <ul
-            className="list-group list-group-flush font-size-12 min-w-0 nodrag"
+            className={joinClasses(EDITOR_LIST_FLUSH, EDITOR_TEXT_SM, EDITOR_MIN_W_0, 'nodrag')}
             aria-label="Node choices"
             onDragOver={handleListDragOver}
             onDrop={handleListDrop}
@@ -56,7 +65,10 @@ export function PromptNodeChoicesList({
             {choices.length === 0 ? (
                 <li
                     className={joinClasses(
-                        'list-group-item py-2 px-2 text-muted',
+                        EDITOR_LIST_ITEM_EMPTY,
+                        EDITOR_SPACING_PY_2,
+                        EDITOR_SPACING_PX_2,
+                        EDITOR_MUTED,
                         choiceDrag && CHOICE_DROP_TARGET_CLASS,
                     )}
                 >
@@ -79,7 +91,7 @@ export function PromptNodeChoicesList({
                 <li
                     className={joinClasses(
                         CHOICE_DROP_APPEND_CLASS,
-                        'list-unstyled',
+                        'graph-editor-list__append-target',
                         choiceDropTarget?.nodeId === nodeId &&
                             choiceDropTarget.index === choices.length &&
                             CHOICE_DROP_TARGET_CLASS,

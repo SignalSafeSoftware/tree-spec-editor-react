@@ -1,5 +1,12 @@
 import { Position, NodeToolbar } from 'reactflow';
 
+import {
+    EDITOR_BTN_GROUP,
+    EDITOR_ICON,
+    EDITOR_SR_ONLY,
+    editorBtnToneClass,
+} from '../ui/editorClasses';
+
 export function PromptNodeToolbar({
     nodeId,
     onDuplicateNode,
@@ -11,25 +18,29 @@ export function PromptNodeToolbar({
 }>) {
     return (
         <NodeToolbar isVisible position={Position.Bottom} offset={8} align="start">
-            <fieldset className="btn-group btn-group-sm shadow-sm border-0 p-0 m-0">
-                <legend className="visually-hidden">Node actions</legend>
+            <fieldset className={EDITOR_BTN_GROUP}>
+                <legend className={EDITOR_SR_ONLY}>Node actions</legend>
                 <button
                     type="button"
-                    className="btn btn-light border"
+                    className={editorBtnToneClass('light')}
                     title="Duplicate node"
                     aria-label="Duplicate node"
                     onClick={() => onDuplicateNode(nodeId)}
                 >
-                    <i className="bi bi-files" aria-hidden />
+                    <span className={EDITOR_ICON} aria-hidden>
+                        ⧉
+                    </span>
                 </button>
                 <button
                     type="button"
-                    className="btn btn-light border text-danger"
+                    className={editorBtnToneClass('danger')}
                     title="Delete node"
                     aria-label="Delete node"
                     onClick={() => onDeleteNode(nodeId)}
                 >
-                    <i className="bi bi-trash" aria-hidden />
+                    <span className={EDITOR_ICON} aria-hidden>
+                        ✕
+                    </span>
                 </button>
             </fieldset>
         </NodeToolbar>

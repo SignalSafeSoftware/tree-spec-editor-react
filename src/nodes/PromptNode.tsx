@@ -10,7 +10,7 @@ import {
 
 import {
     CANVAS_NODE_BODY_CLASS,
-    CANVAS_NODE_CLASS,
+    CANVAS_NODE_CARD_CLASS,
     CANVAS_NODE_SELECTED_CLASS,
     CANVAS_NODE_SELECTED_TEXT_CLASS,
     MIN_NODE_HEIGHT,
@@ -22,7 +22,16 @@ import {
 } from '../canvas/constants';
 import { getPromptNodeBorderClass } from '../canvas/edgeStyle';
 import { useGraphEditorCanvas } from '../GraphEditorCanvasContext';
-import { joinClasses } from '../utils/joinClasses';
+import {
+    EDITOR_CARD_BODY,
+    EDITOR_MIN_W_0,
+    EDITOR_MUTED,
+    EDITOR_SPACING_MB_0,
+    EDITOR_SPACING_PX_2,
+    EDITOR_SPACING_PY_2,
+    EDITOR_TEXT_SM,
+    joinClasses,
+} from '../ui/editorClasses';
 import { PromptNodeChoicesList } from './PromptNodeChoicesList';
 import { PromptNodeHeader } from './PromptNodeHeader';
 import { PromptNodeToolbar } from './PromptNodeToolbar';
@@ -95,9 +104,7 @@ export function PromptNode({ data, selected, id }: PromptNodeProps) {
             ) : null}
             <div
                 className={joinClasses(
-                    'card',
-                    'rounded',
-                    CANVAS_NODE_CLASS,
+                    CANVAS_NODE_CARD_CLASS,
                     borderClass,
                     showNodeHighlight && CANVAS_NODE_SELECTED_CLASS,
                     showNodeHighlight && CANVAS_NODE_SELECTED_TEXT_CLASS,
@@ -117,13 +124,13 @@ export function PromptNode({ data, selected, id }: PromptNodeProps) {
                     locked={locked}
                     readOnly={readOnly}
                 />
-                <div className={`${CANVAS_NODE_BODY_CLASS} min-w-0`} style={scrollBodyStyle}>
-                    <div className="card-body py-2 px-2 min-w-0 nodrag">
+                <div className={joinClasses(CANVAS_NODE_BODY_CLASS, EDITOR_MIN_W_0)} style={scrollBodyStyle}>
+                    <div className={joinClasses(EDITOR_CARD_BODY, EDITOR_SPACING_PY_2, EDITOR_SPACING_PX_2, EDITOR_MIN_W_0, 'nodrag')}>
                         <div
-                            className={joinClasses('font-size-12 mb-0', promptTextClass)}
+                            className={joinClasses(EDITOR_TEXT_SM, EDITOR_SPACING_MB_0, promptTextClass)}
                             title={n.prompt || undefined}
                         >
-                            {n.prompt || <em className="text-muted">(empty prompt)</em>}
+                            {n.prompt || <em className={EDITOR_MUTED}>(empty prompt)</em>}
                         </div>
                     </div>
                     <PromptNodeChoicesList
