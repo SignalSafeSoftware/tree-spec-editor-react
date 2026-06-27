@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Tests: expanded canvas className hooks, denylist guards, and behavior coverage.
+
 ## [0.2.0] - 2026-06-24
 
 ### Added
