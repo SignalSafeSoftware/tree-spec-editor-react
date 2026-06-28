@@ -4,11 +4,14 @@ import { TestRenderer, act } from './reactTestRenderer';
 import TreeSpecGraphEditor from '../src/TreeSpecGraphEditor';
 import { END_NODE_ID, DEFAULT_GRAPH_NODE_WIDTH, GRAPH_SELECTION_KIND, type EditorTree, type GraphEditorIssue } from '@signalsafe/tree-spec-editor-core';
 import {
+    CANVAS_CLASS,
     CANVAS_NODE_SELECTED_CLASS,
     CHOICE_DRAG_HANDLE_CLASS,
     CHOICE_DROP_APPEND_CLASS,
     CHOICE_DROP_TARGET_CLASS,
 } from '../src/canvas/constants';
+import { EDITOR_CANVAS_ROOT } from '../src/ui/editorClasses';
+import { collectBootstrapViolations } from './bootstrapClassDenylist';
 
 const reactFlowState = {
     latestProps: null as any,
@@ -264,6 +267,51 @@ describe('TreeSpecGraphEditor', () => {
         expect(root.findAll((node) => node.type === 'div' && node.children.includes('END')).length).toBeGreaterThan(0);
     });
 
+    it('applies default graph-editor canvas hooks when className is omitted', async () => {
+        await act(async () => {
+            renderer = TestRenderer.create(
+                React.createElement(TreeSpecGraphEditor, {
+                    tree: createTree(),
+                    onChange: vi.fn(),
+                }),
+            );
+        });
+
+        const canvasRoot = renderer!.root.find(
+            (node) =>
+                node.type === 'div' &&
+                typeof node.props.className === 'string' &&
+                node.props.className.includes(CANVAS_CLASS),
+        );
+        const className = canvasRoot.props.className as string;
+        expect(className).toContain(EDITOR_CANVAS_ROOT);
+        expect(className).toContain(CANVAS_CLASS);
+        expect(collectBootstrapViolations(renderer!.root)).toEqual([]);
+    });
+
+    it('merges a host className with the canvas hook without Bootstrap classes', async () => {
+        await act(async () => {
+            renderer = TestRenderer.create(
+                React.createElement(TreeSpecGraphEditor, {
+                    tree: createTree(),
+                    onChange: vi.fn(),
+                    className: 'host-canvas-shell',
+                }),
+            );
+        });
+
+        const canvasRoot = renderer!.root.find(
+            (node) =>
+                node.type === 'div' &&
+                typeof node.props.className === 'string' &&
+                node.props.className.includes(CANVAS_CLASS),
+        );
+        const className = canvasRoot.props.className as string;
+        expect(className).toContain(CANVAS_CLASS);
+        expect(className).toContain('host-canvas-shell');
+        expect(collectBootstrapViolations(renderer!.root)).toEqual([]);
+    });
+
     it('renders warning-only nodes with the warning border class', async () => {
         await act(async () => {
             renderer = TestRenderer.create(
@@ -279,7 +327,7 @@ describe('TreeSpecGraphEditor', () => {
             (node) =>
                 node.type === 'div' &&
                 typeof node.props.className === 'string' &&
-                node.props.className.includes('border-warning')
+                node.props.className.includes('graph-editor-canvas-node--border-warning')
         );
 
         expect(warningCards.length).toBeGreaterThan(0);
@@ -306,7 +354,7 @@ describe('TreeSpecGraphEditor', () => {
                 node.type === 'div' &&
                 typeof node.props.className === 'string' &&
                 node.props.className.includes('graph-editor-canvas-node') &&
-                node.props.className.includes('bg-primary-subtle'),
+                node.props.className.includes('graph-editor-canvas__selected'),
         );
         expect(nodeCard).toHaveLength(0);
 
@@ -315,7 +363,7 @@ describe('TreeSpecGraphEditor', () => {
                 node.type === 'div' &&
                 typeof node.props.className === 'string' &&
                 node.props.className.includes('graph-editor-canvas-choice-selected') &&
-                node.props.className.includes('bg-primary-subtle'),
+                node.props.className.includes('graph-editor-canvas__selected'),
         );
         expect(focusedChoice).toHaveLength(1);
 
@@ -534,7 +582,7 @@ describe('TreeSpecGraphEditor', () => {
             (n) =>
                 n.type === 'div' &&
                 typeof n.props.className === 'string' &&
-                n.props.className.includes('bg-primary-subtle'),
+                n.props.className.includes('graph-editor-canvas__selected'),
         );
         expect(highlighted.length).toBeGreaterThan(0);
     });
@@ -1741,5 +1789,49 @@ describe('TreeSpecGraphEditor', () => {
             reactFlowState.latestProps.onEdgesDelete([]);
         });
         expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('does not emit Bootstrap CSS class tokens in rendered canvas markup', async () => {
+        await act(async () => {
+            renderer = TestRenderer.create(
+                React.createElement(TreeSpecGraphEditor, {
+                    tree: createTree(),
+                    issues: createIssues(),
+                    onChange: vi.fn(),
+                    selected: { kind: 'node', id: 'start' },
+                    focusChoiceId: 'c2',
+                }),
+            );
+        });
+
+        expect(collectBootstrapViolations(renderer!.root)).toEqual([]);
+    });
+
+    it('uses graph-editor badge and list hooks on canvas nodes', async () => {
+        await act(async () => {
+            renderer = TestRenderer.create(
+                React.createElement(TreeSpecGraphEditor, {
+                    tree: createTree(),
+                    issues: createIssues(),
+                    onChange: vi.fn(),
+                }),
+            );
+        });
+
+        const root = renderer!.root;
+        expect(
+            root.findAll(
+                (node) =>
+                    typeof node.props.className === 'string' &&
+                    node.props.className.includes('graph-editor-badge--danger'),
+            ).length,
+        ).toBeGreaterThan(0);
+        expect(
+            root.findAll(
+                (node) =>
+                    typeof node.props.className === 'string' &&
+                    node.props.className.includes('graph-editor-list'),
+            ).length,
+        ).toBeGreaterThan(0);
     });
 });

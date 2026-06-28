@@ -1,4 +1,4 @@
-import { CHOICE_ROW_SELECTOR, REACT_FLOW_PANE_CLASS } from './constants';
+import { CHOICE_ROW_SELECTOR, REACT_FLOW_PANE_CLASS } from './constants.js';
 
 export function isChoiceRowClickTarget(target: EventTarget | null): boolean {
     if (target == null || typeof target !== 'object') return false;

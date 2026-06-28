@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type MouseEvent } from 'react';
 import type { Node } from 'reactflow';
 
-import type { CanvasContextMenuState } from '../contextMenu/types';
+import type { CanvasContextMenuState } from '../contextMenu/types.js';
 
 export type UseCanvasContextMenuOptions = {
     readOnly: boolean;

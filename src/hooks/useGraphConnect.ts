@@ -12,7 +12,7 @@ import {
     type GraphSelection,
 } from '@signalsafe/tree-spec-editor-core';
 
-import { isReactFlowPaneTarget } from '../canvas/typeGuards';
+import { isReactFlowPaneTarget } from '../canvas/typeGuards.js';
 
 export type UseGraphConnectOptions = {
     treeRef: MutableRefObject<EditorTree>;

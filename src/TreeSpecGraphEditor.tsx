@@ -25,22 +25,23 @@ import {
 import {
     GraphEditorCanvasContext,
     type GraphEditorCanvasContextValue,
-} from './GraphEditorCanvasContext';
-import { buildEdgeMarker, getIssueEdgeStyle, resolveSelectedEdgeStroke } from './canvas/edgeStyle';
-import { CANVAS_CLASS } from './canvas/constants';
-import { resolveCanvasFocusChoiceId } from './canvas/focusChoice';
-import { isChoiceRowClickTarget } from './canvas/typeGuards';
-import { GraphCanvasContextMenu } from './contextMenu/GraphCanvasContextMenu';
-import { EndNode } from './nodes/EndNode';
-import { PromptNode } from './nodes/PromptNode';
-import { joinClasses } from './utils/joinClasses';
-import { useCanvasContextMenu } from './hooks/useCanvasContextMenu';
-import { useCanvasGraphState } from './hooks/useCanvasGraphState';
-import { useCanvasIssueIndex } from './hooks/useCanvasIssueIndex';
-import { useCanvasNodeResize } from './hooks/useCanvasNodeResize';
-import { useCanvasViewport } from './hooks/useCanvasViewport';
-import { useChoiceDragDrop } from './hooks/useChoiceDragDrop';
-import { useGraphConnect } from './hooks/useGraphConnect';
+} from './GraphEditorCanvasContext.js';
+import { buildEdgeMarker, getIssueEdgeStyle, resolveSelectedEdgeStroke } from './canvas/edgeStyle.js';
+import { CANVAS_CLASS } from './canvas/constants.js';
+import { EDITOR_CANVAS_ROOT } from './ui/editorClasses.js';
+import { resolveCanvasFocusChoiceId } from './canvas/focusChoice.js';
+import { isChoiceRowClickTarget } from './canvas/typeGuards.js';
+import { GraphCanvasContextMenu } from './contextMenu/GraphCanvasContextMenu.js';
+import { EndNode } from './nodes/EndNode.js';
+import { PromptNode } from './nodes/PromptNode.js';
+import { joinClasses } from './utils/joinClasses.js';
+import { useCanvasContextMenu } from './hooks/useCanvasContextMenu.js';
+import { useCanvasGraphState } from './hooks/useCanvasGraphState.js';
+import { useCanvasIssueIndex } from './hooks/useCanvasIssueIndex.js';
+import { useCanvasNodeResize } from './hooks/useCanvasNodeResize.js';
+import { useCanvasViewport } from './hooks/useCanvasViewport.js';
+import { useChoiceDragDrop } from './hooks/useChoiceDragDrop.js';
+import { useGraphConnect } from './hooks/useGraphConnect.js';
 
 export type TreeSpecGraphEditorProps = {
     tree: EditorTree;
@@ -62,7 +63,7 @@ export type TreeSpecGraphEditorProps = {
     /** Focused choice on the currently selected node (canvas + inspector sync). */
     focusChoiceId?: string | null;
     fitViewNonce?: number;
-    /** Optional class for the outer container (default includes h-70vh border rounded). */
+    /** Optional class for the outer container (default: `graph-editor-canvas-root`). */
     className?: string;
     /** When true, disables canvas editing affordances (toolbar, resize, context menu). */
     readOnly?: boolean;
@@ -77,7 +78,7 @@ export type TreeSpecGraphEditorProps = {
      * Skipped when `focusNodeId` already targets the same node.
      */
     contextualZoom?: boolean;
-    /** Canvas chrome mode — host should pass Bootstrap `colorScheme` (`light` / `dark`). */
+    /** Canvas chrome mode — host theme hint (`light` / `dark`). */
     colorMode?: 'light' | 'dark';
 };
 
@@ -93,7 +94,7 @@ function TreeSpecGraphInner({
     focusChoiceId = null,
     showMiniMap = true,
     fitViewNonce,
-    className = 'h-70vh border rounded',
+    className = EDITOR_CANVAS_ROOT,
     readOnly = false,
     onDuplicateNode,
     onDeleteNode,
