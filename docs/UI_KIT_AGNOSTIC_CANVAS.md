@@ -41,7 +41,7 @@ Text wrap helpers from `@signalsafe/tree-spec-editor-core` already use `graph-ed
 2. **`className` prop** — pass layout/sizing classes on `TreeSpecGraphEditor` (default is `graph-editor-canvas-root`).
 3. **Shell package** — `@signalsafe/tree-spec-editor` can map the same hooks to Bootstrap utilities in host SCSS.
 
-This package ships **no CSS file**; `sideEffects: ["**/*.css"]` applies only to the React Flow stylesheet import.
+This package ships **no CSS file** and does **not** import React Flow styles from built JavaScript. Host apps load `reactflow/dist/style.css` from their own entrypoint when default React Flow chrome is desired.
 
 ---
 

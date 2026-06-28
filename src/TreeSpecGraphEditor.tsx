@@ -10,7 +10,6 @@ import ReactFlow, {
     type Node,
     type NodeTypes,
 } from 'reactflow';
-import 'reactflow/dist/style.css';
 
 import {
     GRAPH_SELECTION_KIND,

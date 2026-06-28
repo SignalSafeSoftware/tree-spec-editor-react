@@ -32,11 +32,11 @@ The React Flow canvas uses **semantic HTML** and **`graph-editor-*` class hooks*
 npm install @signalsafe/tree-spec-editor-react @signalsafe/tree-spec-editor-core @signalsafe/tree-spec react react-dom reactflow
 ```
 
-### React Flow CSS (required)
+### React Flow CSS (host-owned)
 
-This package imports `reactflow/dist/style.css` from source. Bundlers treat it as a side effect (`sideEffects: ["**/*.css"]` in `package.json`).
+This package **does not** import `reactflow/dist/style.css` from built JavaScript. Native Node ESM imports of `@signalsafe/tree-spec-editor-react` therefore do not fail on `.css` file extensions.
 
-Ensure your app loads React Flow styles, for example:
+Host applications that want React Flow default styling should import the stylesheet from their own app entrypoint:
 
 ```ts
 import "reactflow/dist/style.css";
