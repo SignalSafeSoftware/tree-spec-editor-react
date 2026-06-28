@@ -23,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added tests to guard against reintroducing Bootstrap-specific class names or dependencies.
 - Added package smoke checks for the built and packed artifact.
 
+### Fixed
+
+- Addressed SonarCloud maintainability findings by marking graph editor canvas component props as read-only across prompt/end node renderers, choice rows, the canvas context menu, and the main editor shell.
+- Addressed SonarCloud consistency findings by using `export…from` for public barrel re-exports.
+
 ### Notes
 
 - This release does not include `react-bootstrap` or `bootstrap`.
