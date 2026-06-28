@@ -28,7 +28,7 @@ import type {
     GraphEditorVersionInfo,
     UseTreeSpecEditorActions,
     UseTreeSpecEditorOptions,
-} from './types';
+} from './types.js';
 
 export type UseEditorAdapterOptions = {
     options: UseTreeSpecEditorOptions;

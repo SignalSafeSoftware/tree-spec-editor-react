@@ -1,7 +1,7 @@
 import { DEFAULT_CANVAS_EDGE_STROKE } from '@signalsafe/tree-spec-editor-core';
 import type { Edge } from 'reactflow';
 
-import { BORDER_DANGER_CLASS, BORDER_WARNING_CLASS, EDGE_ARROW_MARKER, SELECTED_EDGE_STROKE } from './constants';
+import { BORDER_DANGER_CLASS, BORDER_WARNING_CLASS, EDGE_ARROW_MARKER, SELECTED_EDGE_STROKE } from './constants.js';
 
 export function getPromptNodeBorderClass(hasErrors: boolean, warningCount: number): string {
     if (hasErrors) {

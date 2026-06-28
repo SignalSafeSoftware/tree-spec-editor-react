@@ -1,8 +1,8 @@
 import { END_NODE_ID } from '@signalsafe/tree-spec-editor-core';
 
-import { CONTEXT_MENU_CLASS } from '../canvas/constants';
-import { joinClasses } from '../utils/joinClasses';
-import type { CanvasContextMenuState } from './types';
+import { CONTEXT_MENU_CLASS } from '../canvas/constants.js';
+import { editorDropdownItemClass } from '../ui/editorClasses.js';
+import type { CanvasContextMenuState } from './types.js';
 
 export function GraphCanvasContextMenu({
     menu,
@@ -62,7 +62,7 @@ export function GraphCanvasContextMenu({
                 <button
                     key={item.key}
                     type="button"
-                    className={joinClasses('dropdown-item', item.danger && 'text-danger')}
+                    className={editorDropdownItemClass(item.danger)}
                     role="menuitem"
                     onClick={() => {
                         item.onClick();

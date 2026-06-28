@@ -24,9 +24,9 @@ import {
     type ReactFlowNodeChange,
 } from '@signalsafe/tree-spec-editor-core';
 
-import { buildEdgesFromTransitions, buildTransitionsFromEdges } from '../canvas/edgeBuilders';
-import { NODE_DRAG_HANDLE_SELECTOR } from '../canvas/constants';
-import type { PromptNodeData } from '../nodes/types';
+import { buildEdgesFromTransitions, buildTransitionsFromEdges } from '../canvas/edgeBuilders.js';
+import { NODE_DRAG_HANDLE_SELECTOR } from '../canvas/constants.js';
+import type { PromptNodeData } from '../nodes/types.js';
 
 export type UseCanvasGraphStateOptions = {
     tree: EditorTree;

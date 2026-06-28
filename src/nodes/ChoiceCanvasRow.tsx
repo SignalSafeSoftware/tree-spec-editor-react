@@ -15,9 +15,25 @@ import {
     CHOICE_ROW_SELECT_CLASS,
     CHOICE_ROW_SELECTABLE_CLASS,
     CHOICE_HANDLE_PREFIX,
-} from '../canvas/constants';
-import { useGraphEditorCanvas } from '../GraphEditorCanvasContext';
-import { joinClasses } from '../utils/joinClasses';
+} from '../canvas/constants.js';
+import { useGraphEditorCanvas } from '../GraphEditorCanvasContext.js';
+import {
+    EDITOR_FLEX_ALIGN_CENTER,
+    EDITOR_FLEX_GROW_1,
+    EDITOR_FLEX_ROW,
+    EDITOR_FLEX_SHRINK_0,
+    EDITOR_ICON,
+    EDITOR_LIST_ITEM,
+    EDITOR_MIN_W_0,
+    EDITOR_SPACING_GAP_1,
+    EDITOR_SPACING_P_0,
+    EDITOR_SPACING_PX_2,
+    EDITOR_SPACING_PY_2,
+    EDITOR_TEXT_START,
+    EDITOR_W_FULL,
+    editorBadgeToneClass,
+    joinClasses,
+} from '../ui/editorClasses.js';
 
 export function ChoiceCanvasRow({
     nodeId,
@@ -84,7 +100,9 @@ export function ChoiceCanvasRow({
     return (
         <li
             className={joinClasses(
-                'list-group-item p-0 border-0',
+                EDITOR_LIST_ITEM,
+                EDITOR_SPACING_P_0,
+                'graph-editor-list__item--plain',
                 isDropTarget && CHOICE_DROP_TARGET_CLASS,
             )}
             onDragOver={handleDragOver}
@@ -92,7 +110,13 @@ export function ChoiceCanvasRow({
         >
             <div
                 className={joinClasses(
-                    'd-flex align-items-center gap-1 min-w-0 py-2 px-2 w-100',
+                    EDITOR_FLEX_ROW,
+                    EDITOR_FLEX_ALIGN_CENTER,
+                    EDITOR_SPACING_GAP_1,
+                    EDITOR_MIN_W_0,
+                    EDITOR_SPACING_PY_2,
+                    EDITOR_SPACING_PX_2,
+                    EDITOR_W_FULL,
                     CHOICE_ROW_CLASS,
                     isFocused && CANVAS_CHOICE_SELECTED_CLASS,
                     isFocused && CANVAS_NODE_SELECTED_CLASS,
@@ -102,7 +126,7 @@ export function ChoiceCanvasRow({
                 {readOnly ? null : (
                     <button
                         type="button"
-                        className={`${CHOICE_DRAG_HANDLE_CLASS} flex-shrink-0`}
+                        className={joinClasses(CHOICE_DRAG_HANDLE_CLASS, EDITOR_FLEX_SHRINK_0)}
                         draggable
                         onDragStart={(event) => {
                             event.stopPropagation();
@@ -115,14 +139,21 @@ export function ChoiceCanvasRow({
                         title="Drag to reorder or move to another node"
                         aria-label="Drag choice"
                     >
-                        <i className="bi bi-grip-vertical" aria-hidden />
+                        <span className={joinClasses(EDITOR_ICON, 'graph-editor-icon--grip')} aria-hidden>
+                            ⋮⋮
+                        </span>
                     </button>
                 )}
                 <button
                     type="button"
                     className={joinClasses(
                         CHOICE_ROW_SELECT_CLASS,
-                        'text-start flex-grow-1 min-w-0 d-flex align-items-center gap-1',
+                        EDITOR_TEXT_START,
+                        EDITOR_FLEX_GROW_1,
+                        EDITOR_MIN_W_0,
+                        EDITOR_FLEX_ROW,
+                        EDITOR_FLEX_ALIGN_CENTER,
+                        EDITOR_SPACING_GAP_1,
                         readOnly ? '' : CHOICE_ROW_SELECTABLE_CLASS,
                     )}
                     disabled={readOnly}
@@ -136,10 +167,10 @@ export function ChoiceCanvasRow({
                         }
                     }}
                 >
-                    <span className={joinClasses(choiceTextClass, 'flex-grow-1 min-w-0')} title={choice.label}>
+                    <span className={joinClasses(choiceTextClass, EDITOR_FLEX_GROW_1, EDITOR_MIN_W_0)} title={choice.label}>
                         {choice.label}
                     </span>
-                    <span className="badge bg-light text-dark flex-shrink-0">{choice.id}</span>
+                    <span className={joinClasses(editorBadgeToneClass('neutral'), EDITOR_FLEX_SHRINK_0)}>{choice.id}</span>
                 </button>
                 <Handle
                     type="source"

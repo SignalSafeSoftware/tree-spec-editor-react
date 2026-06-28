@@ -1,7 +1,10 @@
 import { MarkerType } from 'reactflow';
 
+import { joinClasses } from '../utils/joinClasses.js';
+import { EDITOR_CARD, EDITOR_DROPDOWN_MENU, EDITOR_ROUNDED } from '../ui/editorClasses.js';
+
 /** Background highlight when the node matches editor selection (sidebar / issues / canvas). */
-export const CANVAS_NODE_SELECTED_CLASS = 'bg-primary-subtle';
+export const CANVAS_NODE_SELECTED_CLASS = 'graph-editor-canvas__selected';
 
 /** Dark readable text on selected canvas node cards. */
 export const CANVAS_NODE_SELECTED_TEXT_CLASS = 'graph-editor-canvas-selected';
@@ -24,17 +27,25 @@ export const CHOICE_HANDLE_CLASS = 'graph-editor-handle graph-editor-choice-hand
 export const NODE_DRAG_HANDLE_CLASS = 'graph-editor-drag-handle';
 export const NODE_DRAG_HANDLE_SELECTOR = `.${NODE_DRAG_HANDLE_CLASS}`;
 
-export const TARGET_HANDLE_CLASS_DEFAULT = 'handle-bg-default graph-editor-target-handle';
-export const TARGET_HANDLE_CLASS_DANGER = 'handle-bg-danger graph-editor-target-handle';
+export const TARGET_HANDLE_CLASS_DEFAULT = 'graph-editor-target-handle graph-editor-target-handle--default';
+export const TARGET_HANDLE_CLASS_DANGER = 'graph-editor-target-handle graph-editor-target-handle--danger';
 
-export const CONTEXT_MENU_CLASS = 'graph-editor-context-menu dropdown-menu show position-fixed shadow-sm';
+export const CONTEXT_MENU_CLASS = joinClasses(
+    'graph-editor-context-menu',
+    EDITOR_DROPDOWN_MENU,
+    'graph-editor-dropdown__menu--open',
+    'graph-editor-context-menu--fixed',
+    'graph-editor-shadow--sm',
+);
 
 export const REACT_FLOW_PANE_CLASS = 'react-flow__pane';
 
-export const BORDER_DANGER_CLASS = 'border-danger';
-export const BORDER_WARNING_CLASS = 'border-warning';
+export const BORDER_DANGER_CLASS = 'graph-editor-canvas-node--border-danger';
+export const BORDER_WARNING_CLASS = 'graph-editor-canvas-node--border-warning';
 
-export const END_NODE_WIDTH_CLASS = 'w-180';
+export const END_NODE_WIDTH_CLASS = 'graph-editor-canvas-node--end-width';
+
+export const CANVAS_NODE_CARD_CLASS = joinClasses(EDITOR_CARD, EDITOR_ROUNDED, CANVAS_NODE_CLASS);
 
 export const MIN_NODE_WIDTH = 180;
 export const MAX_NODE_WIDTH = 560;
