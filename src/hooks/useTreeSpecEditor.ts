@@ -34,17 +34,17 @@ import {
     type TreeTemplateSpec,
 } from '@signalsafe/tree-spec-editor-core';
 
-import { useEditorAdapter } from './useEditorAdapter';
-import { useEditorAutosave } from './useEditorAutosave';
-import { useEditorHistory } from './useEditorHistory';
-import { useEditorSelection } from './useEditorSelection';
+import { useEditorAdapter } from './useEditorAdapter.js';
+import { useEditorAutosave } from './useEditorAutosave.js';
+import { useEditorHistory } from './useEditorHistory.js';
+import { useEditorSelection } from './useEditorSelection.js';
 import type {
     UseTreeSpecEditorActions,
     UseTreeSpecEditorOptions,
     UseTreeSpecEditorResult,
     UseTreeSpecEditorState,
-} from './types';
-import { dispatchEditorKeyboardShortcut, resolveEditorKeyboardShortcutAction } from './keyboardShortcutDispatch';
+} from './types.js';
+import { dispatchEditorKeyboardShortcut, resolveEditorKeyboardShortcutAction } from './keyboardShortcutDispatch.js';
 
 const DEFAULT_AUTOSAVE_DEBOUNCE_MS = 2500;
 

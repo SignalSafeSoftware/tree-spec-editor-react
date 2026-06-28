@@ -14,8 +14,8 @@ import type { Edge } from 'reactflow';
 import {
     CHOICE_HANDLE_PREFIX,
     TARGET_HANDLE_ID,
-} from './constants';
-import { buildEdgeMarker, buildEdgeStyle, resolveEdgePathStroke } from './edgeStyle';
+} from './constants.js';
+import { buildEdgeMarker, buildEdgeStyle, resolveEdgePathStroke } from './edgeStyle.js';
 
 export function edgeLabelForTransition(tree: EditorTree, t: EditorTransition): string {
     const node = tree.nodes[t.fromNodeId];

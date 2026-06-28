@@ -1,7 +1,7 @@
 import { MarkerType } from 'reactflow';
 
-import { joinClasses } from '../utils/joinClasses';
-import { EDITOR_CARD, EDITOR_DROPDOWN_MENU, EDITOR_ROUNDED } from '../ui/editorClasses';
+import { joinClasses } from '../utils/joinClasses.js';
+import { EDITOR_CARD, EDITOR_DROPDOWN_MENU, EDITOR_ROUNDED } from '../ui/editorClasses.js';
 
 /** Background highlight when the node matches editor selection (sidebar / issues / canvas). */
 export const CANVAS_NODE_SELECTED_CLASS = 'graph-editor-canvas__selected';

@@ -1,6 +1,6 @@
 /** UI-kit agnostic canvas class hooks (aligned with @signalsafe/tree-spec-editor). */
 
-import { joinClasses } from '../utils/joinClasses';
+import { joinClasses } from '../utils/joinClasses.js';
 
 export { joinClasses };
 

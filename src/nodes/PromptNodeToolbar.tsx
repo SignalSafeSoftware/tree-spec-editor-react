@@ -5,7 +5,7 @@ import {
     EDITOR_ICON,
     EDITOR_SR_ONLY,
     editorBtnToneClass,
-} from '../ui/editorClasses';
+} from '../ui/editorClasses.js';
 
 export function PromptNodeToolbar({
     nodeId,

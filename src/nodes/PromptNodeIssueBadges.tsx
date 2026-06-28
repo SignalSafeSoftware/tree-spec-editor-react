@@ -1,4 +1,4 @@
-import { EDITOR_SPACING_ME_1, EDITOR_SPACING_MS_2, editorBadgeToneClass } from '../ui/editorClasses';
+import { EDITOR_SPACING_ME_1, EDITOR_SPACING_MS_2, editorBadgeToneClass } from '../ui/editorClasses.js';
 
 export function PromptNodeIssueBadges({
     issuesTotal,

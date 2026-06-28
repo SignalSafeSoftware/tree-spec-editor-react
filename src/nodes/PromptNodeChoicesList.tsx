@@ -5,8 +5,8 @@ import { type EditorChoice } from '@signalsafe/tree-spec-editor-core';
 import {
     CHOICE_DROP_APPEND_CLASS,
     CHOICE_DROP_TARGET_CLASS,
-} from '../canvas/constants';
-import { type GraphEditorCanvasContextValue } from '../GraphEditorCanvasContext';
+} from '../canvas/constants.js';
+import { type GraphEditorCanvasContextValue } from '../GraphEditorCanvasContext.js';
 import {
     EDITOR_LIST_FLUSH,
     EDITOR_LIST_ITEM_EMPTY,
@@ -16,8 +16,8 @@ import {
     EDITOR_SPACING_PY_2,
     EDITOR_TEXT_SM,
     joinClasses,
-} from '../ui/editorClasses';
-import { ChoiceCanvasRow } from './ChoiceCanvasRow';
+} from '../ui/editorClasses.js';
+import { ChoiceCanvasRow } from './ChoiceCanvasRow.js';
 
 export function PromptNodeChoicesList({
     nodeId,

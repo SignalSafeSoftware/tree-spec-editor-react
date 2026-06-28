@@ -15,8 +15,8 @@ import {
     CHOICE_ROW_SELECT_CLASS,
     CHOICE_ROW_SELECTABLE_CLASS,
     CHOICE_HANDLE_PREFIX,
-} from '../canvas/constants';
-import { useGraphEditorCanvas } from '../GraphEditorCanvasContext';
+} from '../canvas/constants.js';
+import { useGraphEditorCanvas } from '../GraphEditorCanvasContext.js';
 import {
     EDITOR_FLEX_ALIGN_CENTER,
     EDITOR_FLEX_GROW_1,
@@ -33,7 +33,7 @@ import {
     EDITOR_W_FULL,
     editorBadgeToneClass,
     joinClasses,
-} from '../ui/editorClasses';
+} from '../ui/editorClasses.js';
 
 export function ChoiceCanvasRow({
     nodeId,

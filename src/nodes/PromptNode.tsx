@@ -19,9 +19,9 @@ import {
     MAX_NODE_WIDTH,
     TARGET_HANDLE_CLASS_DEFAULT,
     TARGET_HANDLE_ID,
-} from '../canvas/constants';
-import { getPromptNodeBorderClass } from '../canvas/edgeStyle';
-import { useGraphEditorCanvas } from '../GraphEditorCanvasContext';
+} from '../canvas/constants.js';
+import { getPromptNodeBorderClass } from '../canvas/edgeStyle.js';
+import { useGraphEditorCanvas } from '../GraphEditorCanvasContext.js';
 import {
     EDITOR_CARD_BODY,
     EDITOR_MIN_W_0,
@@ -31,11 +31,11 @@ import {
     EDITOR_SPACING_PY_2,
     EDITOR_TEXT_SM,
     joinClasses,
-} from '../ui/editorClasses';
-import { PromptNodeChoicesList } from './PromptNodeChoicesList';
-import { PromptNodeHeader } from './PromptNodeHeader';
-import { PromptNodeToolbar } from './PromptNodeToolbar';
-import type { PromptNodeData } from './types';
+} from '../ui/editorClasses.js';
+import { PromptNodeChoicesList } from './PromptNodeChoicesList.js';
+import { PromptNodeHeader } from './PromptNodeHeader.js';
+import { PromptNodeToolbar } from './PromptNodeToolbar.js';
+import type { PromptNodeData } from './types.js';
 
 type PromptNodeProps = Readonly<NodeProps<PromptNodeData>>;
 

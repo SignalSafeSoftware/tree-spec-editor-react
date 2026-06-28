@@ -4,7 +4,7 @@ import { compileTreeSpec } from '@signalsafe/tree-spec';
 
 import { AUTOSAVE_STATUS, type AutosaveStatus, type EditorTree } from '@signalsafe/tree-spec-editor-core';
 
-import type { UseTreeSpecEditorActions } from './types';
+import type { UseTreeSpecEditorActions } from './types.js';
 
 export type UseEditorAutosaveOptions = {
     enableAutosave: boolean;

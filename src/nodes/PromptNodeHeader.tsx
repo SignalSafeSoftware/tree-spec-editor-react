@@ -1,6 +1,6 @@
 import { getEditorHints, type EditorNode } from '@signalsafe/tree-spec-editor-core';
 
-import { NODE_DRAG_HANDLE_CLASS } from '../canvas/constants';
+import { NODE_DRAG_HANDLE_CLASS } from '../canvas/constants.js';
 import {
     EDITOR_CARD_HEADER_MUTED,
     EDITOR_FLEX_ALIGN_START,
@@ -21,9 +21,9 @@ import {
     EDITOR_TEXT_MD,
     EDITOR_TEXT_XS,
     joinClasses,
-} from '../ui/editorClasses';
-import { PromptNodeIssueBadges } from './PromptNodeIssueBadges';
-import type { PromptNodeData } from './types';
+} from '../ui/editorClasses.js';
+import { PromptNodeIssueBadges } from './PromptNodeIssueBadges.js';
+import type { PromptNodeData } from './types.js';
 
 export function PromptNodeHeader({
     node,

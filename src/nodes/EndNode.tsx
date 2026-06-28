@@ -8,7 +8,7 @@ import {
     END_NODE_WIDTH_CLASS,
     TARGET_HANDLE_CLASS_DANGER,
     TARGET_HANDLE_ID,
-} from '../canvas/constants';
+} from '../canvas/constants.js';
 import {
     EDITOR_CARD_BODY,
     EDITOR_MUTED,
@@ -18,7 +18,7 @@ import {
     EDITOR_TEXT_DANGER,
     EDITOR_TEXT_SM,
     joinClasses,
-} from '../ui/editorClasses';
+} from '../ui/editorClasses.js';
 
 export function EndNode({ selected }: NodeProps) {
     return (

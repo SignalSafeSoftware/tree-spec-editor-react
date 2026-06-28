@@ -11,10 +11,10 @@
  * callbacks.
  */
 
-export { default } from './TreeSpecGraphEditor';
-export type { TreeSpecGraphEditorProps } from './TreeSpecGraphEditor';
+export { default } from './TreeSpecGraphEditor.js';
+export type { TreeSpecGraphEditorProps } from './TreeSpecGraphEditor.js';
 
-export { useTreeSpecEditor } from './hooks/useTreeSpecEditor';
+export { useTreeSpecEditor } from './hooks/useTreeSpecEditor.js';
 export type {
     AdapterValidationIssue,
     GraphEditorVersionInfo,
@@ -23,4 +23,4 @@ export type {
     UseTreeSpecEditorOptions,
     UseTreeSpecEditorResult,
     UseTreeSpecEditorState,
-} from './hooks/types';
+} from './hooks/types.js';
