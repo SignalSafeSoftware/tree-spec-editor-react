@@ -34,10 +34,10 @@
         }
     },
     "files": [
-    "dist",
-    "README.md",
-    "LICENSE",
-    "docs"
+        "dist",
+        "README.md",
+        "LICENSE",
+        "docs"
     ],
     "engines": {
         "node": ">=22.12.0"
@@ -52,6 +52,8 @@
         "typecheck": "tsc --noEmit",
         "pack:local": "npm pack --pack-destination ../../dist/reusable-npm",
         "smoke:package": "node scripts/smoke-package.mjs",
+        "docs:images": "yarn build && node docs/demo/generate-doc-images.mjs",
+        "docs:check": "node docs/demo/generate-doc-images.mjs --check",
         "prepublishOnly": "npm run build",
         "prepare": "npm run build",
         "test": "vitest run",
@@ -71,12 +73,14 @@
         "@types/react": "^18.2.66",
         "@types/react-dom": "^18.2.22",
         "@types/react-test-renderer": "^18.3.0",
+        "@vitest/coverage-v8": "^3.2.4",
+        "playwright": "^1.62.1",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "react-test-renderer": "^18.3.1",
         "reactflow": "^11.11.4",
         "typescript": "^7.0.2",
-        "@vitest/coverage-v8": "^3.2.4",
+        "vite": "^8.2.2",
         "vitest": "^3.2.4"
     }
 }

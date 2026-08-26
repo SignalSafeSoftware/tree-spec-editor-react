@@ -101,6 +101,18 @@ For full authoring flows (load/save/validate), compose **`useTreeSpecEditor`** w
 
 Import from `@signalsafe/tree-spec-editor-react` only (no subpath exports).
 
+## Documentation preview
+
+The graph image below is generated from the live example data with the built
+`TreeSpecGraphEditor` component. The browser-backed generator captures the
+same React Flow canvas that this package exports, including the editor's
+virtual `END` node.
+
+![TreeSpec editor example flow](./docs/tree-spec-example-flow.svg)
+
+Run `yarn docs:images` to regenerate the image locally. CI runs
+`yarn docs:check` with Chromium to keep the committed asset in sync.
+
 ## Package boundaries
 
 | Layer | Package |

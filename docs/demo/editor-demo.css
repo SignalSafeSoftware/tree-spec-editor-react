@@ -1,0 +1,298 @@
+:root {
+    --graph-editor-bg: #ffffff;
+    --graph-editor-text: #212529;
+    --graph-editor-muted: #6c757d;
+    --graph-editor-panel-bg: #f8f9fa;
+    --graph-editor-border: #dee2e6;
+    --graph-editor-border-subtle: #e9ecef;
+    --graph-editor-accent: #0d6efd;
+    --graph-editor-danger: #dc3545;
+    --graph-editor-success: #198754;
+    --graph-editor-radius: 0.375rem;
+    --graph-editor-border-width: 1px;
+    --graph-editor-node-border-width: 4px;
+    --bs-primary-bg-subtle: #cfe2ff;
+    --bs-warning: #ffc107;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    width: 1400px;
+    height: 840px;
+    margin: 0;
+}
+
+body {
+    background: #eef1f5;
+    color: var(--graph-editor-text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.docs-preview {
+    display: flex;
+    width: 1400px;
+    height: 840px;
+    flex-direction: column;
+    gap: 12px;
+    padding: 34px 38px 38px;
+    background: linear-gradient(135deg, #f7f9fc 0%, #edf1f6 100%);
+    color: var(--graph-editor-text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.docs-preview__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.docs-preview__eyebrow {
+    color: #0d6efd;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.docs-preview h1 {
+    margin: 2px 0 0;
+    font-size: 27px;
+    line-height: 1.2;
+}
+
+.docs-preview__status {
+    border: 1px solid #b8d4fe;
+    border-radius: 999px;
+    color: #0a58ca;
+    background: #e7f1ff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 12px;
+}
+
+.docs-preview__description {
+    margin: 0;
+    color: #536273;
+    font-size: 14px;
+}
+
+.docs-preview code {
+    border-radius: 4px;
+    color: #495057;
+    background: #e9ecef;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.92em;
+    padding: 2px 5px;
+}
+
+.docs-preview__canvas {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    border: 1px solid #d6dde6;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 9px 28px rgb(32 51 74 / 10%);
+}
+
+.docs-preview .graph-editor-canvas-root,
+.docs-preview .graph-editor-canvas {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.docs-preview .graph-editor-canvas {
+    color: var(--graph-editor-text);
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.docs-preview .graph-editor-card {
+    border: var(--graph-editor-border-width) solid var(--graph-editor-border);
+    border-radius: var(--graph-editor-radius);
+    background: var(--graph-editor-bg);
+}
+
+.docs-preview .graph-editor-card__header {
+    padding: 8px 12px;
+    border-bottom: var(--graph-editor-border-width) solid var(--graph-editor-border);
+    background: var(--graph-editor-panel-bg);
+    font-weight: 600;
+}
+
+.docs-preview .graph-editor-card__body {
+    padding: 12px;
+}
+
+.docs-preview .graph-editor-canvas-node {
+    min-width: 0;
+    overflow: visible;
+    border-radius: var(--graph-editor-radius);
+    border-style: solid;
+    border-width: var(--graph-editor-node-border-width);
+}
+
+.docs-preview .graph-editor-canvas-node--end-width {
+    width: 180px;
+}
+
+.docs-preview .graph-editor-canvas-node-body {
+    min-width: 0;
+}
+
+.docs-preview .graph-editor-canvas-node .graph-editor-card__body {
+    min-width: 0;
+    background: transparent;
+}
+
+.docs-preview .graph-editor-canvas-node .graph-editor-list__item {
+    width: 100%;
+    padding: 5px 8px;
+    border-top: 1px solid var(--graph-editor-border-subtle);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+}
+
+.docs-preview .graph-editor-canvas-node .graph-editor-list__item:first-child {
+    border-top: 0;
+}
+
+.docs-preview .graph-editor-list--flush {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.docs-preview .graph-editor-canvas .react-flow__node:has(.graph-editor-canvas-node) {
+    overflow: visible;
+}
+
+.docs-preview .graph-editor-text--sm {
+    font-size: 14px;
+}
+
+.docs-preview .graph-editor-text--md {
+    font-size: 16px;
+}
+
+.docs-preview .graph-editor-text--xs {
+    font-size: 12px;
+}
+
+.docs-preview .graph-editor-text--bold {
+    font-weight: 700;
+}
+
+.docs-preview .graph-editor-text--danger {
+    color: var(--graph-editor-danger);
+}
+
+.docs-preview .graph-editor-text--center {
+    text-align: center;
+}
+
+.docs-preview .graph-editor-muted {
+    color: var(--graph-editor-muted);
+}
+
+.docs-preview .graph-editor-flex {
+    display: flex;
+}
+
+.docs-preview .graph-editor-flex--row {
+    flex-direction: row;
+}
+
+.docs-preview .graph-editor-flex--between {
+    justify-content: space-between;
+}
+
+.docs-preview .graph-editor-flex--align-start {
+    align-items: flex-start;
+}
+
+.docs-preview .graph-editor-flex-shrink-0 {
+    flex-shrink: 0;
+}
+
+.docs-preview .graph-editor-flex-grow-1 {
+    flex-grow: 1;
+}
+
+.docs-preview .graph-editor-min-w-0 {
+    min-width: 0;
+}
+
+.docs-preview .graph-editor-overflow-hidden {
+    overflow: hidden;
+}
+
+.docs-preview .graph-editor-spacing--py-2 {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.docs-preview .graph-editor-spacing--px-2 {
+    padding-right: 8px;
+    padding-left: 8px;
+}
+
+.docs-preview .graph-editor-spacing--p-2 {
+    padding: 8px;
+}
+
+.docs-preview .graph-editor-spacing--mb-0 {
+    margin-bottom: 0;
+}
+
+.docs-preview .graph-editor-spacing--ms-1 {
+    margin-left: 4px;
+}
+
+.docs-preview .graph-editor-spacing--gap-1 {
+    gap: 4px;
+}
+
+.docs-preview .graph-editor-spacing--gap-2 {
+    gap: 8px;
+}
+
+.docs-preview .graph-editor-rounded {
+    border-radius: var(--graph-editor-radius);
+}
+
+.docs-preview .graph-editor-icon {
+    display: inline-block;
+}
+
+.docs-preview .graph-editor-choice-row-select {
+    width: 100%;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+}
+
+.docs-preview .graph-editor-canvas-node--border-danger {
+    border-color: var(--graph-editor-danger) !important;
+}
+
+.docs-preview .react-flow__controls {
+    display: none;
+}
