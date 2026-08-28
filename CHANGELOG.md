@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-08-28
+
+### Added
+
+- A package-boundary test that verifies every external runtime import is declared and Bootstrap remains excluded.
+
+### Changed
+
+- Require `@signalsafe/tree-spec` **^0.3.4** and `@signalsafe/tree-spec-editor-core` **^0.1.6**.
+- Raise the minimum supported Node.js to **>=22.12.0** and run the CI matrix on Node **22** and **24** only; Node 20 is dropped because of GitHub Actions deprecation.
+
 ## [0.2.4] - 2026-08-28
 
 ### Fixed
@@ -96,7 +107,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Checks and tests on every PR; Sonar **`scan`** is label-gated on PRs and runs on tag push and manual dispatch (Batch 1).
 - Publish only from manual **`main`** dispatch or **`v*`** tags (not PR labels); publish requires **`checks`**, **`tests`**, and **`scan`**.
 
-[Unreleased]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.4...HEAD
+[Unreleased]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.5...HEAD
+[0.2.5]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.1...v0.2.2

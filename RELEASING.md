@@ -8,7 +8,7 @@ Standalone repository: [SignalSafeSoftware/tree-spec-editor-react](https://githu
 
 ## Requirements
 
-- Node.js **>=22.12.0** for local development, CI, and publish smoke (see `package.json` `engines`). CI matrix tests Node **22** and **24**; publish uses Node **24**.
+- Node.js **>=22.12.0** for local development, CI, and publish smoke (see `package.json` `engines`). CI matrix tests Node **22** and **24**; publish uses Node **24**. Node 20 is no longer supported because of GitHub Actions deprecation.
 
 ## CI publish policy
 

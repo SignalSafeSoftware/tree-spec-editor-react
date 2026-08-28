@@ -11,7 +11,7 @@ describe('package metadata', () => {
             description?: string;
         };
 
-        expect(pkg.version).toBe('0.2.4');
+        expect(pkg.version).toBe('0.2.5');
         expect(pkg.peerDependencies?.['react-bootstrap']).toBeUndefined();
         expect(pkg.devDependencies?.['react-bootstrap']).toBeUndefined();
         expect(pkg.keywords?.some((k) => /bootstrap/i.test(k))).toBe(false);
