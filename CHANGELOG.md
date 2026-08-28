@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-08-28
+
+### Added
+
+- A live-canvas documentation demo and generated TreeSpec example-flow SVG.
+
+### Changed
+
+- Updated the TypeScript 7-compatible build configuration and current CI action dependencies.
+
 ## [0.2.1] - 2026-06-28
 
 ### Fixed
@@ -74,7 +84,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Checks and tests on every PR; Sonar **`scan`** is label-gated on PRs and runs on tag push and manual dispatch (Batch 1).
 - Publish only from manual **`main`** dispatch or **`v*`** tags (not PR labels); publish requires **`checks`**, **`tests`**, and **`scan`**.
 
-[Unreleased]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/releases/tag/v0.1.3
