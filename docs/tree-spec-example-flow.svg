@@ -4,146 +4,710 @@
   <title>TreeSpec editor incident response example</title>
   <foreignObject x="0" y="0" width="1400" height="840">
     <div xmlns="http://www.w3.org/1999/xhtml">
-      <style>.react-flow { direction: ltr; }
-.react-flow__container { position: absolute; width: 100%; height: 100%; top: 0px; left: 0px; }
-.react-flow__pane { z-index: 1; cursor: grab; }
-.react-flow__pane.selection { cursor: pointer; }
-.react-flow__pane.dragging { cursor: grabbing; }
-.react-flow__viewport { transform-origin: 0px 0px; z-index: 2; pointer-events: none; }
-.react-flow__renderer { z-index: 4; }
-.react-flow__selection { z-index: 6; }
-.react-flow__nodesselection-rect:focus, .react-flow__nodesselection-rect:focus-visible { outline: none; }
-.react-flow .react-flow__edges { pointer-events: none; overflow: visible; }
-.react-flow__edge-path, .react-flow__connection-path { stroke: rgb(177, 177, 183); stroke-width: 1; fill: none; }
-.react-flow__edge { pointer-events: visiblestroke; cursor: pointer; }
-.react-flow__edge.animated path { stroke-dasharray: 5; animation: 0.5s linear 0s infinite normal none running dashdraw; }
-.react-flow__edge.animated path.react-flow__edge-interaction { stroke-dasharray: none; animation: auto ease 0s 1 normal none running none; }
-.react-flow__edge.inactive { pointer-events: none; }
-.react-flow__edge.selected, .react-flow__edge:focus, .react-flow__edge:focus-visible { outline: none; }
-.react-flow__edge.selected .react-flow__edge-path, .react-flow__edge:focus .react-flow__edge-path, .react-flow__edge:focus-visible .react-flow__edge-path { stroke: rgb(85, 85, 85); }
-.react-flow__edge-textwrapper { pointer-events: all; }
-.react-flow__edge-textbg { fill: white; }
-.react-flow__edge .react-flow__edge-text { pointer-events: none; user-select: none; }
-.react-flow__connection { pointer-events: none; }
-.react-flow__connection .animated { stroke-dasharray: 5; animation: 0.5s linear 0s infinite normal none running dashdraw; }
-.react-flow__connectionline { z-index: 1001; }
-.react-flow__nodes { pointer-events: none; transform-origin: 0px 0px; }
-.react-flow__node { position: absolute; user-select: none; pointer-events: all; transform-origin: 0px 0px; box-sizing: border-box; cursor: grab; }
-.react-flow__node.dragging { cursor: grabbing; }
-.react-flow__nodesselection { z-index: 3; transform-origin: left top; pointer-events: none; }
-.react-flow__nodesselection-rect { position: absolute; pointer-events: all; cursor: grab; }
-.react-flow__handle { position: absolute; pointer-events: none; min-width: 5px; min-height: 5px; width: 6px; height: 6px; background: rgb(26, 25, 43); border: 1px solid white; border-radius: 100%; }
-.react-flow__handle.connectionindicator { pointer-events: all; cursor: crosshair; }
-.react-flow__handle-bottom { top: auto; left: 50%; bottom: -4px; transform: translate(-50%, 0px); }
-.react-flow__handle-top { left: 50%; top: -4px; transform: translate(-50%, 0px); }
-.react-flow__handle-left { top: 50%; left: -4px; transform: translate(0px, -50%); }
-.react-flow__handle-right { right: -4px; top: 50%; transform: translate(0px, -50%); }
-.react-flow__edgeupdater { cursor: move; pointer-events: all; }
-.react-flow__panel { position: absolute; z-index: 5; margin: 15px; }
-.react-flow__panel.top { top: 0px; }
-.react-flow__panel.bottom { bottom: 0px; }
-.react-flow__panel.left { left: 0px; }
-.react-flow__panel.right { right: 0px; }
-.react-flow__panel.center { left: 50%; transform: translateX(-50%); }
-.react-flow__attribution { font-size: 10px; background: rgba(255, 255, 255, 0.5); padding: 2px 3px; margin: 0px; }
-.react-flow__attribution a { text-decoration: none; color: rgb(153, 153, 153); }
+      <style>/* this gets exported as style.css and can be used for the default theming */
+/* these are the necessary styles for React Flow, they get used by base.css and style.css */
+.react-flow {
+  direction: ltr;
+}
+.react-flow__container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+.react-flow__pane {
+  z-index: 1;
+  cursor: -webkit-grab;
+  cursor: grab;
+}
+.react-flow__pane.selection {
+    cursor: pointer;
+  }
+.react-flow__pane.dragging {
+    cursor: -webkit-grabbing;
+    cursor: grabbing;
+  }
+.react-flow__viewport {
+  transform-origin: 0 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.react-flow__renderer {
+  z-index: 4;
+}
+.react-flow__selection {
+  z-index: 6;
+}
+.react-flow__nodesselection-rect:focus,
+.react-flow__nodesselection-rect:focus-visible {
+  outline: none;
+}
+.react-flow .react-flow__edges {
+  pointer-events: none;
+  overflow: visible;
+}
+.react-flow__edge-path,
+.react-flow__connection-path {
+  stroke: #b1b1b7;
+  stroke-width: 1;
+  fill: none;
+}
+.react-flow__edge {
+  pointer-events: visibleStroke;
+  cursor: pointer;
+}
+.react-flow__edge.animated path {
+    stroke-dasharray: 5;
+    -webkit-animation: dashdraw 0.5s linear infinite;
+            animation: dashdraw 0.5s linear infinite;
+  }
+.react-flow__edge.animated path.react-flow__edge-interaction {
+    stroke-dasharray: none;
+    -webkit-animation: none;
+            animation: none;
+  }
+.react-flow__edge.inactive {
+    pointer-events: none;
+  }
+.react-flow__edge.selected,
+  .react-flow__edge:focus,
+  .react-flow__edge:focus-visible {
+    outline: none;
+  }
+.react-flow__edge.selected .react-flow__edge-path,
+  .react-flow__edge:focus .react-flow__edge-path,
+  .react-flow__edge:focus-visible .react-flow__edge-path {
+    stroke: #555;
+  }
+.react-flow__edge-textwrapper {
+    pointer-events: all;
+  }
+.react-flow__edge-textbg {
+    fill: white;
+  }
+.react-flow__edge .react-flow__edge-text {
+    pointer-events: none;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+            user-select: none;
+  }
+.react-flow__connection {
+  pointer-events: none;
+}
+.react-flow__connection .animated {
+    stroke-dasharray: 5;
+    -webkit-animation: dashdraw 0.5s linear infinite;
+            animation: dashdraw 0.5s linear infinite;
+  }
+.react-flow__connectionline {
+  z-index: 1001;
+}
+.react-flow__nodes {
+  pointer-events: none;
+  transform-origin: 0 0;
+}
+.react-flow__node {
+  position: absolute;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  pointer-events: all;
+  transform-origin: 0 0;
+  box-sizing: border-box;
+  cursor: -webkit-grab;
+  cursor: grab;
+}
+.react-flow__node.dragging {
+    cursor: -webkit-grabbing;
+    cursor: grabbing;
+  }
+.react-flow__nodesselection {
+  z-index: 3;
+  transform-origin: left top;
+  pointer-events: none;
+}
+.react-flow__nodesselection-rect {
+    position: absolute;
+    pointer-events: all;
+    cursor: -webkit-grab;
+    cursor: grab;
+  }
+.react-flow__handle {
+  position: absolute;
+  pointer-events: none;
+  min-width: 5px;
+  min-height: 5px;
+  width: 6px;
+  height: 6px;
+  background: #1a192b;
+  border: 1px solid white;
+  border-radius: 100%;
+}
+.react-flow__handle.connectionindicator {
+    pointer-events: all;
+    cursor: crosshair;
+  }
+.react-flow__handle-bottom {
+    top: auto;
+    left: 50%;
+    bottom: -4px;
+    transform: translate(-50%, 0);
+  }
+.react-flow__handle-top {
+    left: 50%;
+    top: -4px;
+    transform: translate(-50%, 0);
+  }
+.react-flow__handle-left {
+    top: 50%;
+    left: -4px;
+    transform: translate(0, -50%);
+  }
+.react-flow__handle-right {
+    right: -4px;
+    top: 50%;
+    transform: translate(0, -50%);
+  }
+.react-flow__edgeupdater {
+  cursor: move;
+  pointer-events: all;
+}
+.react-flow__panel {
+  position: absolute;
+  z-index: 5;
+  margin: 15px;
+}
+.react-flow__panel.top {
+    top: 0;
+  }
+.react-flow__panel.bottom {
+    bottom: 0;
+  }
+.react-flow__panel.left {
+    left: 0;
+  }
+.react-flow__panel.right {
+    right: 0;
+  }
+.react-flow__panel.center {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+.react-flow__attribution {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 2px 3px;
+  margin: 0;
+}
+.react-flow__attribution a {
+    text-decoration: none;
+    color: #999;
+  }
 @-webkit-keyframes dashdraw {
-  0% { stroke-dashoffset: 10; }
+  from {
+    stroke-dashoffset: 10;
+  }
 }
 @keyframes dashdraw {
-  0% { stroke-dashoffset: 10; }
+  from {
+    stroke-dashoffset: 10;
+  }
 }
-.react-flow__edgelabel-renderer { position: absolute; width: 100%; height: 100%; pointer-events: none; user-select: none; }
-.react-flow__edge.updating .react-flow__edge-path { stroke: rgb(119, 119, 119); }
-.react-flow__edge-text { font-size: 10px; }
-.react-flow__node.selectable:focus, .react-flow__node.selectable:focus-visible { outline: none; }
-.react-flow__node-default, .react-flow__node-input, .react-flow__node-output, .react-flow__node-group { padding: 10px; border-radius: 3px; width: 150px; font-size: 12px; color: rgb(34, 34, 34); text-align: center; border-width: 1px; border-style: solid; border-color: rgb(26, 25, 43); background-color: white; }
-.react-flow__node-default.selectable:hover, .react-flow__node-input.selectable:hover, .react-flow__node-output.selectable:hover, .react-flow__node-group.selectable:hover { box-shadow: rgba(0, 0, 0, 0.08) 0px 1px 4px 1px; }
-.react-flow__node-default.selectable.selected, .react-flow__node-default.selectable:focus, .react-flow__node-default.selectable:focus-visible, .react-flow__node-input.selectable.selected, .react-flow__node-input.selectable:focus, .react-flow__node-input.selectable:focus-visible, .react-flow__node-output.selectable.selected, .react-flow__node-output.selectable:focus, .react-flow__node-output.selectable:focus-visible, .react-flow__node-group.selectable.selected, .react-flow__node-group.selectable:focus, .react-flow__node-group.selectable:focus-visible { box-shadow: rgb(26, 25, 43) 0px 0px 0px 0.5px; }
-.react-flow__node-group { background-color: rgba(240, 240, 240, 0.25); }
-.react-flow__nodesselection-rect, .react-flow__selection { background: rgba(0, 89, 220, 0.08); border: 1px dotted rgba(0, 89, 220, 0.8); }
-.react-flow__nodesselection-rect:focus, .react-flow__nodesselection-rect:focus-visible, .react-flow__selection:focus, .react-flow__selection:focus-visible { outline: none; }
-.react-flow__controls { box-shadow: rgba(0, 0, 0, 0.08) 0px 0px 2px 1px; }
-.react-flow__controls-button { border-width: medium medium 1px; border-style: none none solid; border-color: currentcolor currentcolor rgb(238, 238, 238); border-image: none; background: rgb(254, 254, 254); box-sizing: content-box; display: flex; justify-content: center; align-items: center; width: 16px; height: 16px; cursor: pointer; user-select: none; padding: 5px; }
-.react-flow__controls-button:hover { background: rgb(244, 244, 244); }
-.react-flow__controls-button svg { width: 100%; max-width: 12px; max-height: 12px; }
-.react-flow__controls-button:disabled { pointer-events: none; }
-.react-flow__controls-button:disabled svg { fill-opacity: 0.4; }
-.react-flow__minimap { background-color: rgb(255, 255, 255); }
-.react-flow__minimap svg { display: block; }
-.react-flow__resize-control { position: absolute; }
-.react-flow__resize-control.left, .react-flow__resize-control.right { cursor: ew-resize; }
-.react-flow__resize-control.top, .react-flow__resize-control.bottom { cursor: ns-resize; }
-.react-flow__resize-control.top.left, .react-flow__resize-control.bottom.right { cursor: nwse-resize; }
-.react-flow__resize-control.bottom.left, .react-flow__resize-control.top.right { cursor: nesw-resize; }
-.react-flow__resize-control.handle { width: 4px; height: 4px; border: 1px solid rgb(255, 255, 255); border-radius: 1px; background-color: rgb(51, 103, 217); transform: translate(-50%, -50%); }
-.react-flow__resize-control.handle.left { left: 0px; top: 50%; }
-.react-flow__resize-control.handle.right { left: 100%; top: 50%; }
-.react-flow__resize-control.handle.top { left: 50%; top: 0px; }
-.react-flow__resize-control.handle.bottom { left: 50%; top: 100%; }
-.react-flow__resize-control.handle.top.left { left: 0px; }
-.react-flow__resize-control.handle.bottom.left { left: 0px; }
-.react-flow__resize-control.handle.top.right { left: 100%; }
-.react-flow__resize-control.handle.bottom.right { left: 100%; }
-.react-flow__resize-control.line { border-color: rgb(51, 103, 217); border-width: 0px; border-style: solid; }
-.react-flow__resize-control.line.left, .react-flow__resize-control.line.right { width: 1px; transform: translate(-50%, 0px); top: 0px; height: 100%; }
-.react-flow__resize-control.line.left { left: 0px; border-left-width: 1px; }
-.react-flow__resize-control.line.right { left: 100%; border-right-width: 1px; }
-.react-flow__resize-control.line.top, .react-flow__resize-control.line.bottom { height: 1px; transform: translate(0px, -50%); left: 0px; width: 100%; }
-.react-flow__resize-control.line.top { top: 0px; border-top-width: 1px; }
-.react-flow__resize-control.line.bottom { border-bottom-width: 1px; top: 100%; }
-:root { --graph-editor-bg: #ffffff; --graph-editor-text: #212529; --graph-editor-muted: #6c757d; --graph-editor-panel-bg: #f8f9fa; --graph-editor-border: #dee2e6; --graph-editor-border-subtle: #e9ecef; --graph-editor-accent: #0d6efd; --graph-editor-danger: #dc3545; --graph-editor-success: #198754; --graph-editor-radius: 0.375rem; --graph-editor-border-width: 1px; --graph-editor-node-border-width: 4px; --bs-primary-bg-subtle: #cfe2ff; --bs-warning: #ffc107; }
-* { box-sizing: border-box; }
-html, body, #root { width: 1400px; height: 840px; margin: 0px; }
-body { background: rgb(238, 241, 245); color: var(--graph-editor-text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.5; }
-.docs-preview { display: flex; width: 1400px; height: 840px; flex-direction: column; gap: 12px; padding: 34px 38px 38px; background: linear-gradient(135deg, rgb(247, 249, 252) 0%, rgb(237, 241, 246) 100%); color: var(--graph-editor-text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.5; }
-.docs-preview__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
-.docs-preview__eyebrow { color: rgb(13, 110, 253); font-size: 12px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; }
-.docs-preview h1 { margin: 2px 0px 0px; font-size: 27px; line-height: 1.2; }
-.docs-preview__status { border: 1px solid rgb(184, 212, 254); border-radius: 999px; color: rgb(10, 88, 202); background: rgb(231, 241, 255); font-size: 13px; font-weight: 600; padding: 7px 12px; }
-.docs-preview__description { margin: 0px; color: rgb(83, 98, 115); font-size: 14px; }
-.docs-preview code { border-radius: 4px; color: rgb(73, 80, 87); background: rgb(233, 236, 239); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.92em; padding: 2px 5px; }
-.docs-preview__canvas { min-height: 0px; flex: 1 1 auto; overflow: hidden; border: 1px solid rgb(214, 221, 230); border-radius: 10px; background: rgb(255, 255, 255); box-shadow: rgba(32, 51, 74, 0.1) 0px 9px 28px; }
-.docs-preview .graph-editor-canvas-root, .docs-preview .graph-editor-canvas { width: 100%; height: 100%; min-height: 0px; }
-.docs-preview .graph-editor-canvas { color: var(--graph-editor-text); font-family: inherit; font-size: 16px; line-height: 1.5; }
-.docs-preview .graph-editor-card { border: var(--graph-editor-border-width) solid var(--graph-editor-border); border-radius: var(--graph-editor-radius); background: var(--graph-editor-bg); }
-.docs-preview .graph-editor-card__header { padding: 8px 12px; border-bottom: var(--graph-editor-border-width) solid var(--graph-editor-border); background: var(--graph-editor-panel-bg); font-weight: 600; }
-.docs-preview .graph-editor-card__body { padding: 12px; }
-.docs-preview .graph-editor-canvas-node { min-width: 0px; overflow: visible; border-radius: var(--graph-editor-radius); border-style: solid; border-width: var(--graph-editor-node-border-width); }
-.docs-preview .graph-editor-canvas-node--end-width { width: 180px; }
-.docs-preview .graph-editor-canvas-node-body { min-width: 0px; }
-.docs-preview .graph-editor-canvas-node .graph-editor-card__body { min-width: 0px; background: transparent; }
-.docs-preview .graph-editor-canvas-node .graph-editor-list__item { width: 100%; padding: 5px 8px; border-top: 1px solid var(--graph-editor-border-subtle); background: transparent; color: inherit; font: inherit; text-align: start; }
-.docs-preview .graph-editor-canvas-node .graph-editor-list__item:first-child { border-top: 0px; }
-.docs-preview .graph-editor-list--flush { margin: 0px; padding: 0px; list-style: none; }
-.docs-preview .graph-editor-canvas .react-flow__node:has(.graph-editor-canvas-node) { overflow: visible; }
-.docs-preview .graph-editor-text--sm { font-size: 14px; }
-.docs-preview .graph-editor-text--md { font-size: 16px; }
-.docs-preview .graph-editor-text--xs { font-size: 12px; }
-.docs-preview .graph-editor-text--bold { font-weight: 700; }
-.docs-preview .graph-editor-text--danger { color: var(--graph-editor-danger); }
-.docs-preview .graph-editor-text--center { text-align: center; }
-.docs-preview .graph-editor-muted { color: var(--graph-editor-muted); }
-.docs-preview .graph-editor-flex { display: flex; }
-.docs-preview .graph-editor-flex--row { flex-direction: row; }
-.docs-preview .graph-editor-flex--between { justify-content: space-between; }
-.docs-preview .graph-editor-flex--align-start { align-items: flex-start; }
-.docs-preview .graph-editor-flex-shrink-0 { flex-shrink: 0; }
-.docs-preview .graph-editor-flex-grow-1 { flex-grow: 1; }
-.docs-preview .graph-editor-min-w-0 { min-width: 0px; }
-.docs-preview .graph-editor-overflow-hidden { overflow: hidden; }
-.docs-preview .graph-editor-spacing--py-2 { padding-top: 8px; padding-bottom: 8px; }
-.docs-preview .graph-editor-spacing--px-2 { padding-right: 8px; padding-left: 8px; }
-.docs-preview .graph-editor-spacing--p-2 { padding: 8px; }
-.docs-preview .graph-editor-spacing--mb-0 { margin-bottom: 0px; }
-.docs-preview .graph-editor-spacing--ms-1 { margin-left: 4px; }
-.docs-preview .graph-editor-spacing--gap-1 { gap: 4px; }
-.docs-preview .graph-editor-spacing--gap-2 { gap: 8px; }
-.docs-preview .graph-editor-rounded { border-radius: var(--graph-editor-radius); }
-.docs-preview .graph-editor-icon { display: inline-block; }
-.docs-preview .graph-editor-choice-row-select { width: 100%; border: 0px; padding: 0px; background: transparent; color: inherit; font: inherit; text-align: start; }
-.docs-preview .graph-editor-canvas-node--border-danger { border-color: var(--graph-editor-danger) !important; }
-.docs-preview .react-flow__controls { display: none; }</style>
+.react-flow__edgelabel-renderer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.react-flow__edge.updating .react-flow__edge-path {
+      stroke: #777;
+    }
+.react-flow__edge-text {
+    font-size: 10px;
+  }
+.react-flow__node.selectable:focus,
+  .react-flow__node.selectable:focus-visible {
+    outline: none;
+  }
+.react-flow__node-default,
+.react-flow__node-input,
+.react-flow__node-output,
+.react-flow__node-group {
+  padding: 10px;
+  border-radius: 3px;
+  width: 150px;
+  font-size: 12px;
+  color: #222;
+  text-align: center;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #1a192b;
+  background-color: white;
+}
+.react-flow__node-default.selectable:hover, .react-flow__node-input.selectable:hover, .react-flow__node-output.selectable:hover, .react-flow__node-group.selectable:hover {
+      box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.08);
+    }
+.react-flow__node-default.selectable.selected,
+    .react-flow__node-default.selectable:focus,
+    .react-flow__node-default.selectable:focus-visible,
+    .react-flow__node-input.selectable.selected,
+    .react-flow__node-input.selectable:focus,
+    .react-flow__node-input.selectable:focus-visible,
+    .react-flow__node-output.selectable.selected,
+    .react-flow__node-output.selectable:focus,
+    .react-flow__node-output.selectable:focus-visible,
+    .react-flow__node-group.selectable.selected,
+    .react-flow__node-group.selectable:focus,
+    .react-flow__node-group.selectable:focus-visible {
+      box-shadow: 0 0 0 0.5px #1a192b;
+    }
+.react-flow__node-group {
+  background-color: rgba(240, 240, 240, 0.25);
+}
+.react-flow__nodesselection-rect,
+.react-flow__selection {
+  background: rgba(0, 89, 220, 0.08);
+  border: 1px dotted rgba(0, 89, 220, 0.8);
+}
+.react-flow__nodesselection-rect:focus,
+  .react-flow__nodesselection-rect:focus-visible,
+  .react-flow__selection:focus,
+  .react-flow__selection:focus-visible {
+    outline: none;
+  }
+.react-flow__controls {
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.08);
+}
+.react-flow__controls-button {
+    border: none;
+    background: #fefefe;
+    border-bottom: 1px solid #eee;
+    box-sizing: content-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+            user-select: none;
+    padding: 5px;
+  }
+.react-flow__controls-button:hover {
+      background: #f4f4f4;
+    }
+.react-flow__controls-button svg {
+      width: 100%;
+      max-width: 12px;
+      max-height: 12px;
+    }
+.react-flow__controls-button:disabled {
+      pointer-events: none;
+    }
+.react-flow__controls-button:disabled svg {
+        fill-opacity: 0.4;
+      }
+.react-flow__minimap {
+  background-color: #fff;
+}
+.react-flow__minimap svg {
+  display: block;
+}
+.react-flow__resize-control {
+  position: absolute;
+}
+.react-flow__resize-control.left,
+.react-flow__resize-control.right {
+  cursor: ew-resize;
+}
+.react-flow__resize-control.top,
+.react-flow__resize-control.bottom {
+  cursor: ns-resize;
+}
+.react-flow__resize-control.top.left,
+.react-flow__resize-control.bottom.right {
+  cursor: nwse-resize;
+}
+.react-flow__resize-control.bottom.left,
+.react-flow__resize-control.top.right {
+  cursor: nesw-resize;
+}
+/* handle styles */
+.react-flow__resize-control.handle {
+  width: 4px;
+  height: 4px;
+  border: 1px solid #fff;
+  border-radius: 1px;
+  background-color: #3367d9;
+  transform: translate(-50%, -50%);
+}
+.react-flow__resize-control.handle.left {
+  left: 0;
+  top: 50%;
+}
+.react-flow__resize-control.handle.right {
+  left: 100%;
+  top: 50%;
+}
+.react-flow__resize-control.handle.top {
+  left: 50%;
+  top: 0;
+}
+.react-flow__resize-control.handle.bottom {
+  left: 50%;
+  top: 100%;
+}
+.react-flow__resize-control.handle.top.left {
+  left: 0;
+}
+.react-flow__resize-control.handle.bottom.left {
+  left: 0;
+}
+.react-flow__resize-control.handle.top.right {
+  left: 100%;
+}
+.react-flow__resize-control.handle.bottom.right {
+  left: 100%;
+}
+/* line styles */
+.react-flow__resize-control.line {
+  border-color: #3367d9;
+  border-width: 0;
+  border-style: solid;
+}
+.react-flow__resize-control.line.left,
+.react-flow__resize-control.line.right {
+  width: 1px;
+  transform: translate(-50%, 0);
+  top: 0;
+  height: 100%;
+}
+.react-flow__resize-control.line.left {
+  left: 0;
+  border-left-width: 1px;
+}
+.react-flow__resize-control.line.right {
+  left: 100%;
+  border-right-width: 1px;
+}
+.react-flow__resize-control.line.top,
+.react-flow__resize-control.line.bottom {
+  height: 1px;
+  transform: translate(0, -50%);
+  left: 0;
+  width: 100%;
+}
+.react-flow__resize-control.line.top {
+  top: 0;
+  border-top-width: 1px;
+}
+.react-flow__resize-control.line.bottom {
+  border-bottom-width: 1px;
+  top: 100%;
+}
+:root {
+    --graph-editor-bg: #ffffff;
+    --graph-editor-text: #212529;
+    --graph-editor-muted: #6c757d;
+    --graph-editor-panel-bg: #f8f9fa;
+    --graph-editor-border: #dee2e6;
+    --graph-editor-border-subtle: #e9ecef;
+    --graph-editor-accent: #0d6efd;
+    --graph-editor-danger: #dc3545;
+    --graph-editor-success: #198754;
+    --graph-editor-radius: 0.375rem;
+    --graph-editor-border-width: 1px;
+    --graph-editor-node-border-width: 4px;
+    --bs-primary-bg-subtle: #cfe2ff;
+    --bs-warning: #ffc107;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    width: 1400px;
+    height: 840px;
+    margin: 0;
+}
+
+body {
+    background: #eef1f5;
+    color: var(--graph-editor-text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.docs-preview {
+    display: flex;
+    width: 1400px;
+    height: 840px;
+    flex-direction: column;
+    gap: 12px;
+    padding: 34px 38px 38px;
+    background: linear-gradient(135deg, #f7f9fc 0%, #edf1f6 100%);
+    color: var(--graph-editor-text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.docs-preview__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.docs-preview__eyebrow {
+    color: #0d6efd;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.docs-preview h1 {
+    margin: 2px 0 0;
+    font-size: 27px;
+    line-height: 1.2;
+}
+
+.docs-preview__status {
+    border: 1px solid #b8d4fe;
+    border-radius: 999px;
+    color: #0a58ca;
+    background: #e7f1ff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 12px;
+}
+
+.docs-preview__description {
+    margin: 0;
+    color: #536273;
+    font-size: 14px;
+}
+
+.docs-preview code {
+    border-radius: 4px;
+    color: #495057;
+    background: #e9ecef;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.92em;
+    padding: 2px 5px;
+}
+
+.docs-preview__canvas {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    border: 1px solid #d6dde6;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 9px 28px rgb(32 51 74 / 10%);
+}
+
+.docs-preview .graph-editor-canvas-root,
+.docs-preview .graph-editor-canvas {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.docs-preview .graph-editor-canvas {
+    color: var(--graph-editor-text);
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.docs-preview .graph-editor-card {
+    border: var(--graph-editor-border-width) solid var(--graph-editor-border);
+    border-radius: var(--graph-editor-radius);
+    background: var(--graph-editor-bg);
+}
+
+.docs-preview .graph-editor-card__header {
+    padding: 8px 12px;
+    border-bottom: var(--graph-editor-border-width) solid var(--graph-editor-border);
+    background: var(--graph-editor-panel-bg);
+    font-weight: 600;
+}
+
+.docs-preview .graph-editor-card__body {
+    padding: 12px;
+}
+
+.docs-preview .graph-editor-canvas-node {
+    min-width: 0;
+    overflow: visible;
+    border-radius: var(--graph-editor-radius);
+    border-style: solid;
+    border-width: var(--graph-editor-node-border-width);
+}
+
+.docs-preview .graph-editor-canvas-node--end-width {
+    width: 180px;
+}
+
+.docs-preview .graph-editor-canvas-node-body {
+    min-width: 0;
+}
+
+.docs-preview .graph-editor-canvas-node .graph-editor-card__body {
+    min-width: 0;
+    background: transparent;
+}
+
+.docs-preview .graph-editor-canvas-node .graph-editor-list__item {
+    width: 100%;
+    padding: 5px 8px;
+    border-top: 1px solid var(--graph-editor-border-subtle);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+}
+
+.docs-preview .graph-editor-canvas-node .graph-editor-list__item:first-child {
+    border-top: 0;
+}
+
+.docs-preview .graph-editor-list--flush {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.docs-preview .graph-editor-canvas .react-flow__node:has(.graph-editor-canvas-node) {
+    overflow: visible;
+}
+
+.docs-preview .graph-editor-text--sm {
+    font-size: 14px;
+}
+
+.docs-preview .graph-editor-text--md {
+    font-size: 16px;
+}
+
+.docs-preview .graph-editor-text--xs {
+    font-size: 12px;
+}
+
+.docs-preview .graph-editor-text--bold {
+    font-weight: 700;
+}
+
+.docs-preview .graph-editor-text--danger {
+    color: var(--graph-editor-danger);
+}
+
+.docs-preview .graph-editor-text--center {
+    text-align: center;
+}
+
+.docs-preview .graph-editor-muted {
+    color: var(--graph-editor-muted);
+}
+
+.docs-preview .graph-editor-flex {
+    display: flex;
+}
+
+.docs-preview .graph-editor-flex--row {
+    flex-direction: row;
+}
+
+.docs-preview .graph-editor-flex--between {
+    justify-content: space-between;
+}
+
+.docs-preview .graph-editor-flex--align-start {
+    align-items: flex-start;
+}
+
+.docs-preview .graph-editor-flex-shrink-0 {
+    flex-shrink: 0;
+}
+
+.docs-preview .graph-editor-flex-grow-1 {
+    flex-grow: 1;
+}
+
+.docs-preview .graph-editor-min-w-0 {
+    min-width: 0;
+}
+
+.docs-preview .graph-editor-overflow-hidden {
+    overflow: hidden;
+}
+
+.docs-preview .graph-editor-spacing--py-2 {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.docs-preview .graph-editor-spacing--px-2 {
+    padding-right: 8px;
+    padding-left: 8px;
+}
+
+.docs-preview .graph-editor-spacing--p-2 {
+    padding: 8px;
+}
+
+.docs-preview .graph-editor-spacing--mb-0 {
+    margin-bottom: 0;
+}
+
+.docs-preview .graph-editor-spacing--ms-1 {
+    margin-left: 4px;
+}
+
+.docs-preview .graph-editor-spacing--gap-1 {
+    gap: 4px;
+}
+
+.docs-preview .graph-editor-spacing--gap-2 {
+    gap: 8px;
+}
+
+.docs-preview .graph-editor-rounded {
+    border-radius: var(--graph-editor-radius);
+}
+
+.docs-preview .graph-editor-icon {
+    display: inline-block;
+}
+
+.docs-preview .graph-editor-choice-row-select {
+    width: 100%;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+}
+
+.docs-preview .graph-editor-canvas-node--border-danger {
+    border-color: var(--graph-editor-danger) !important;
+}
+
+.docs-preview .react-flow__controls {
+    display: none;
+}</style>
       <main class="docs-preview" id="editor-preview"><header class="docs-preview__header"><div><div class="docs-preview__eyebrow">TreeSpec editor</div><h1>Incident response decision tree</h1></div><div class="docs-preview__status">Read-only example</div></header><p class="docs-preview__description">Generated from the exported <code>TreeSpecGraphEditor</code> with the editor model and live example data.</p><section class="docs-preview__canvas" aria-label="TreeSpec editor graph"><div class="graph-editor-canvas-root graph-editor-canvas" data-color-mode="light"><div class="react-flow" data-testid="rf__wrapper" style="width: 100%; height: 100%; overflow: hidden; position: relative; z-index: 0;"><div class="react-flow__renderer" style="position: absolute; width: 100%; height: 100%; top: 0px; left: 0px;"><div class="react-flow__pane" style="position: absolute; width: 100%; height: 100%; top: 0px; left: 0px;"><div class="react-flow__viewport react-flow__container" style="transform: translate(36px, 72px) scale(0.82);"><svg xmlns="http://www.w3.org/2000/svg" width="1322" height="668" class="react-flow__edges react-flow__container" style="z-index: 0;"><defs><marker class="react-flow__arrowhead" id="1__color=#b1b1b7&amp;height=16&amp;type=arrowclosed&amp;width=16" markerWidth="16" markerHeight="16" viewBox="-10 -10 20 20" markerUnits="strokeWidth" orient="auto-start-reverse" refX="0" refY="0"><polyline stroke-linecap="round" stroke-linejoin="round" points="-5,-4 0,0 -5,4 -5,-4" style="stroke: rgb(177, 177, 183); fill: rgb(177, 177, 183); stroke-width: 1;"></polyline></marker></defs><g><g class="react-flow__edge react-flow__edge-smoothstep nopan" tabindex="0" role="button" data-testid="rf__edge-triage-investigate" aria-label="Edge from triage to investigate" aria-describedby="react-flow__edge-desc-1"><path d="M324.00000818764295 172.49998436904536L344.00000818764295 172.49998436904536L 385.0000048381527,172.49998436904536Q 390.0000048381527,172.49998436904536 390.0000048381527,177.49998436904536L 390.0000048381527,227.5000029773247Q 390.0000048381527,232.5000029773247 395.0000048381527,232.5000029773247L436.00000148866235 232.5000029773247L456.00000148866235 232.5000029773247" fill="none" class="react-flow__edge-path" marker-end="url('#1__color=#b1b1b7&amp;height=16&amp;type=arrowclosed&amp;width=16')" marker-start="url('#')" style="stroke-width: 2;"></path><path d="M324.00000818764295 172.49998436904536L344.00000818764295 172.49998436904536L 385.0000048381527,172.49998436904536Q 390.0000048381527,172.49998436904536 390.0000048381527,177.49998436904536L 390.0000048381527,227.5000029773247Q 390.0000048381527,232.5000029773247 395.0000048381527,232.5000029773247L436.00000148866235 232.5000029773247L456.00000148866235 232.5000029773247" fill="none" stroke-opacity="0" stroke-width="20" class="react-flow__edge-interaction"></path><g transform="translate(265.0476427776058 196.40243279061667)" class="react-flow__edge-textwrapper" visibility="visible"><rect width="253.90472412109375" x="-2" y="-4" height="20.19512176513672" class="react-flow__edge-textbg" rx="2" ry="2"></rect><text class="react-flow__edge-text" y="6.097560882568359" dy="0.3em">Investigate the email headers and isolate the device</text></g><circle class="react-flow__edgeupdater react-flow__edgeupdater-target" cx="446.00000148866235" cy="232.5000029773247" r="10" stroke="transparent" fill="transparent"></circle></g><g class="react-flow__edge react-flow__edge-smoothstep nopan" tabindex="0" role="button" data-testid="rf__edge-triage-dismiss" aria-label="Edge from triage to END" aria-describedby="react-flow__edge-desc-1"><path d="M324.00000818764295 172.49998436904536L344.00000818764295 172.49998436904536L 804.9999862298732,172.49998436904536Q 809.9999862298732,172.49998436904536 809.9999862298732,167.49998436904536L 809.9999862298732,119.49998362471418Q 809.9999862298732,114.49998362471418 814.9999862298732,114.49998362471418L1275.9999642721036 114.49998362471418L1295.9999642721036 114.49998362471418" fill="none" class="react-flow__edge-path" marker-end="url('#1__color=#b1b1b7&amp;height=16&amp;type=arrowclosed&amp;width=16')" marker-start="url('#')" style="stroke-width: 2;"></path><path d="M324.00000818764295 172.49998436904536L344.00000818764295 172.49998436904536L 804.9999862298732,172.49998436904536Q 809.9999862298732,172.49998436904536 809.9999862298732,167.49998436904536L 809.9999862298732,119.49998362471418Q 809.9999862298732,114.49998362471418 814.9999862298732,114.49998362471418L1275.9999642721036 114.49998362471418L1295.9999642721036 114.49998362471418" fill="none" stroke-opacity="0" stroke-width="20" class="react-flow__edge-interaction"></path><g transform="translate(646.1280379876857 137.4024231143114)" class="react-flow__edge-textwrapper" visibility="visible"><rect width="331.743896484375" x="-2" y="-4" height="20.19512176513672" class="react-flow__edge-textbg" rx="2" ry="2"></rect><text class="react-flow__edge-text" y="6.097560882568359" dy="0.3em">Assume it is harmless and dismiss the report  →  END (compromised)</text></g><circle class="react-flow__edgeupdater react-flow__edgeupdater-target" cx="1285.9999642721036" cy="114.49998362471418" r="10" stroke="transparent" fill="transparent"></circle></g><g class="react-flow__edge react-flow__edge-smoothstep nopan" tabindex="0" role="button" data-testid="rf__edge-investigate-escalate" aria-label="Edge from investigate to recovery" aria-describedby="react-flow__edge-desc-1"><path d="M743.9999895793635 232.5000029773247L763.9999895793635 232.5000029773247L 805.0000141422922,232.5000029773247Q 810.0000141422922,232.5000029773247 810.0000141422922,237.5000029773247L 810.0000141422922,242.49997320407775Q 810.0000141422922,247.49997320407775 815.0000141422922,247.49997320407775L856.0000387052211 247.49997320407775L876.0000387052211 247.49997320407775" fill="none" class="react-flow__edge-path" marker-end="url('#1__color=#b1b1b7&amp;height=16&amp;type=arrowclosed&amp;width=16')" marker-start="url('#')" style="stroke-width: 2;"></path><path d="M743.9999895793635 232.5000029773247L763.9999895793635 232.5000029773247L 805.0000141422922,232.5000029773247Q 810.0000141422922,232.5000029773247 810.0000141422922,237.5000029773247L 810.0000141422922,242.49997320407775Q 810.0000141422922,247.49997320407775 815.0000141422922,247.49997320407775L856.0000387052211 247.49997320407775L876.0000387052211 247.49997320407775" fill="none" stroke-opacity="0" stroke-width="20" class="react-flow__edge-interaction"></path><g transform="translate(682.8658664982493 233.90242720813285)" class="react-flow__edge-textwrapper" visibility="visible"><rect width="258.26829528808594" x="-2" y="-4" height="20.19512176513672" class="react-flow__edge-textbg" rx="2" ry="2"></rect><text class="react-flow__edge-text" y="6.097560882568359" dy="0.3em">Escalate to incident response and preserve evidence</text></g><circle class="react-flow__edgeupdater react-flow__edgeupdater-target" cx="866.0000387052211" cy="247.49997320407775" r="10" stroke="transparent" fill="transparent"></circle></g><g class="react-flow__edge react-flow__edge-smoothstep nopan" tabindex="0" role="button" data-testid="rf__edge-investigate-reimage" aria-label="Edge from investigate to END" aria-describedby="react-flow__edge-desc-1"><path d="M743.9999895793635 232.5000029773247L763.9999895793635 232.5000029773247L 1014.9999769257336,232.5000029773247Q 1019.9999769257336,232.5000029773247 1019.9999769257336,227.5000029773247L 1019.9999769257336,119.49998362471418Q 1019.9999769257336,114.49998362471418 1024.9999769257336,114.49998362471418L1275.9999642721036 114.49998362471418L1295.9999642721036 114.49998362471418" fill="none" class="react-flow__edge-path" marker-end="url('#1__color=#b1b1b7&amp;height=16&amp;type=arrowclosed&amp;width=16')" marker-start="url('#')" style="stroke-width: 2;"></path><path d="M743.9999895793635 232.5000029773247L763.9999895793635 232.5000029773247L 1014.9999769257336,232.5000029773247Q 1019.9999769257336,232.5000029773247 1019.9999769257336,227.5000029773247L 1019.9999769257336,119.49998362471418Q 1019.9999769257336,114.49998362471418 1024.9999769257336,114.49998362471418L1275.9999642721036 114.49998362471418L1295.9999642721036 114.49998362471418" fill="none" stroke-opacity="0" stroke-width="20" class="react-flow__edge-interaction"></path><g transform="translate(861.2442548798351 167.40243241845107)" class="react-flow__edge-textwrapper" visibility="visible"><rect width="321.5114440917969" x="-2" y="-4" height="20.19512176513672" class="react-flow__edge-textbg" rx="2" ry="2"></rect><text class="react-flow__edge-text" y="6.097560882568359" dy="0.3em">Reimage immediately without collecting evidence  →  END (at_risk)</text></g><circle class="react-flow__edgeupdater react-flow__edgeupdater-target" cx="1285.9999642721036" cy="114.49998362471418" r="10" stroke="transparent" fill="transparent"></circle></g><g class="react-flow__edge react-flow__edge-smoothstep nopan" tabindex="0" role="button" data-testid="rf__edge-recovery-close" aria-label="Edge from recovery to END" aria-describedby="react-flow__edge-desc-1"><path d="M1164.0001012290397 247.49997320407775L1184.0001012290397 247.49997320407775L 1225.0000327505718,247.49997320407775Q 1230.0000327505718,247.49997320407775 1230.0000327505718,242.49997320407775L 1230.0000327505718,119.49998362471418Q 1230.0000327505718,114.49998362471418 1235.0000327505718,114.49998362471418L1275.9999642721036 114.49998362471418L1295.9999642721036 114.49998362471418" fill="none" class="react-flow__edge-path" marker-end="url('#1__color=#b1b1b7&amp;height=16&amp;type=arrowclosed&amp;width=16')" marker-start="url('#')" style="stroke-width: 2;"></path><path d="M1164.0001012290397 247.49997320407775L1184.0001012290397 247.49997320407775L 1225.0000327505718,247.49997320407775Q 1230.0000327505718,247.49997320407775 1230.0000327505718,242.49997320407775L 1230.0000327505718,119.49998362471418Q 1230.0000327505718,114.49998362471418 1235.0000327505718,114.49998362471418L1275.9999642721036 114.49998362471418L1295.9999642721036 114.49998362471418" fill="none" stroke-opacity="0" stroke-width="20" class="react-flow__edge-interaction"></path><g transform="translate(1162.0693915762554 174.9024175318276)" class="react-flow__edge-textwrapper" visibility="visible"><rect width="139.8612823486328" x="-2" y="-4" height="20.19512176513672" class="react-flow__edge-textbg" rx="2" ry="2"></rect><text class="react-flow__edge-text" y="6.097560882568359" dy="0.3em">Close incident  →  END (safe)</text></g><circle class="react-flow__edgeupdater react-flow__edgeupdater-target" cx="1285.9999642721036" cy="114.49998362471418" r="10" stroke="transparent" fill="transparent"></circle></g></g></svg><div class="react-flow__edgelabel-renderer"></div><div class="react-flow__nodes" style="position: absolute; width: 100%; height: 100%; top: 0px; left: 0px;"><div class="react-flow__node react-flow__node-promptNode nopan" data-id="triage" data-testid="rf__node-triage" tabindex="0" role="button" aria-describedby="react-flow__node-desc-1" style="z-index: 0; transform: translate(40px, 40px); pointer-events: all; visibility: visible; width: 280px;"><div class="graph-editor-card graph-editor-rounded graph-editor-canvas-node" style="width: 100%; height: 100%; min-width: 0px; box-sizing: border-box; display: flex; flex-direction: column;"><div data-handleid="in" data-nodeid="triage" data-handlepos="left" data-id="triage-in-target" class="react-flow__handle react-flow__handle-left nodrag nopan graph-editor-target-handle graph-editor-target-handle--default target connectable connectablestart connectableend connectionindicator"></div><div class="graph-editor-card__header graph-editor-surface--muted graph-editor-spacing--py-2 graph-editor-spacing--px-2 graph-editor-min-w-0 graph-editor-flex-shrink-0"><div class="graph-editor-flex graph-editor-flex--between graph-editor-flex graph-editor-flex--align-start graph-editor-spacing--gap-2 graph-editor-min-w-0"><div class="graph-editor-flex graph-editor-flex--row graph-editor-flex graph-editor-flex--align-start graph-editor-spacing--gap-1 graph-editor-min-w-0 graph-editor-flex-grow-1 graph-editor-overflow-hidden"><div class="graph-editor-min-w-0 graph-editor-flex-grow-1 graph-editor-overflow-hidden"><div class="graph-editor-text--bold graph-editor-text--md">▶ prompt</div></div></div><div class="graph-editor-muted graph-editor-text--xs graph-editor-flex-shrink-0">triage</div></div></div><div class="graph-editor-canvas-node-body graph-editor-min-w-0"><div class="graph-editor-card__body graph-editor-spacing--py-2 graph-editor-spacing--px-2 graph-editor-min-w-0 nodrag"><div class="graph-editor-text--sm graph-editor-spacing--mb-0 graph-editor-node-text-wrap min-w-0" title="An employee reports a suspicious attachment. What is the first response?">An employee reports a suspicious attachment. What is the first response?</div></div><ul class="graph-editor-list graph-editor-list--flush graph-editor-text--sm graph-editor-min-w-0 nodrag" aria-label="Node choices"><li class="graph-editor-list__item graph-editor-spacing--p-0 graph-editor-list__item--plain"><div class="graph-editor-flex graph-editor-flex--row graph-editor-flex graph-editor-flex--align-center graph-editor-spacing--gap-1 graph-editor-min-w-0 graph-editor-spacing--py-2 graph-editor-spacing--px-2 graph-editor-w-full graph-editor-choice-row"><button type="button" class="graph-editor-choice-row-select graph-editor-text--start graph-editor-flex-grow-1 graph-editor-min-w-0 graph-editor-flex graph-editor-flex--row graph-editor-flex graph-editor-flex--align-center graph-editor-spacing--gap-1" disabled=""><span class="graph-editor-node-text-wrap min-w-0 graph-editor-flex-grow-1 graph-editor-min-w-0" title="Investigate the email headers and isolate the device">Investigate the email headers and isolate the device</span><span class="graph-editor-badge graph-editor-badge--neutral graph-editor-flex-shrink-0">investigate</span></button><div data-handleid="choice:investigate" data-nodeid="triage" data-handlepos="right" data-id="triage-choice:investigate-source" class="react-flow__handle react-flow__handle-right nodrag nopan graph-editor-handle graph-editor-choice-handle source connectable connectablestart connectableend connectionindicator"></div></div></li><li class="graph-editor-list__item graph-editor-spacing--p-0 graph-editor-list__item--plain"><div class="graph-editor-flex graph-editor-flex--row graph-editor-flex graph-editor-flex--align-center graph-editor-spacing--gap-1 graph-editor-min-w-0 graph-editor-spacing--py-2 graph-editor-spacing--px-2 graph-editor-w-full graph-editor-choice-row"><button type="button" class="graph-editor-choice-row-select graph-editor-text--start graph-editor-flex-grow-1 graph-editor-min-w-0 graph-editor-flex graph-editor-flex--row graph-editor-flex graph-editor-flex--align-center graph-editor-spacing--gap-1" disabled=""><span class="graph-editor-node-text-wrap min-w-0 graph-editor-flex-grow-1 graph-editor-min-w-0" title="Assume it is harmless and dismiss the report">Assume it is harmless and dismiss the report</span><span class="graph-editor-badge graph-editor-badge--neutral graph-editor-flex-shrink-0">dismiss</span></button><div data-handleid="choice:dismiss" data-nodeid="triage" data-handlepos="right" data-id="triage-choice:dismiss-source" class="react-flow__handle react-flow__handle-right nodrag nopan graph-editor-handle graph-editor-choice-handle source connectable connectablestart connectableend connectionindicator"></div></div></li></ul></div></div></div><div class="react-flow__node react-flow__node-promptNode nopan" data-id="investigate" data-testid="rf__node-investigate" tabindex="0" role="button" aria-describedby="react-flow__node-desc-1" style="z-index: 0; transform: translate(460px, 100px); pointer-events: all; visibility: visible; width: 280px;"><div class="graph-editor-card graph-editor-rounded graph-editor-canvas-node" style="width: 100%; height: 100%; min-width: 0px; box-sizing: border-box; display: flex; flex-direction: column;"><div data-handleid="in" data-nodeid="investigate" data-handlepos="left" data-id="investigate-in-target" class="react-flow__handle react-flow__handle-left nodrag nopan graph-editor-target-handle graph-editor-target-handle--default target connectable connectablestart connectableend connectionindicator"></div><div class="graph-editor-card__header graph-editor-surface--muted graph-editor-spacing--py-2 graph-editor-spacing--px-2 graph-editor-min-w-0 graph-editor-flex-shrink-0"><div class="graph-editor-flex graph-editor-flex--between graph-editor-flex graph-editor-flex--align-start graph-editor-spacing--gap-2 graph-editor-min-w-0"><div class="graph-editor-flex graph-editor-flex--row graph-editor-flex graph-editor-flex--align-start graph-editor-spacing--gap-1 graph-editor-min-w-0 graph-editor-flex-grow-1 graph-editor-overflow-hidden"><div class="graph-editor-min-w-0 graph-editor-flex-grow-1 graph-editor-overflow-hidden"><div class="graph-editor-text--bold graph-editor-text--md">prompt</div></div></div><div class="graph-editor-muted graph-editor-text--xs graph-editor-flex-shrink-0">investig</div></div></div><div class="graph-editor-canvas-node-body graph-editor-min-w-0"><div class="graph-editor-card__body graph-editor-spacing--py-2 graph-editor-spacing--px-2 graph-editor-min-w-0 nodrag"><div class="graph-editor-text--sm graph-editor-spacing--mb-0 graph-editor-node-text-wrap min-w-0" title="The attachment contacted an unknown host. What do you do next?">The attachment contacted an unknown host. What do you do next?</div></div><ul class="graph-editor-list graph-editor-list--flush graph-editor-text--sm graph-editor-min-w-0 nodrag" aria-label="Node choices"><li class="graph-editor-list__item graph-editor-spacing--p-0 graph-editor-list__item--plain"><div class="graph-editor-flex graph-editor-flex--row graph-editor-flex graph-editor-flex--align-center graph-editor-spacing--gap-1 graph-editor-min-w-0 graph-editor-spacing--py-2 graph-editor-spacing--px-2 graph-editor-w-full graph-editor-choice-row"><button type="button" class="graph-editor-choice-row-select graph-editor-text--start graph-editor-flex-grow-1 graph-editor-min-w-0 graph-editor-flex graph-editor-flex--row graph-editor-flex graph-editor-flex--align-center graph-editor-spacing--gap-1" disabled=""><span class="graph-editor-node-text-wrap min-w-0 graph-editor-flex-grow-1 graph-editor-min-w-0" title="Escalate to incident response and preserve evidence">Escalate to incident response and preserve evidence</span><span class="graph-editor-badge graph-editor-badge--neutral graph-editor-flex-shrink-0">escalate</span></button><div data-handleid="choice:escalate" data-nodeid="investigate" data-handlepos="right" data-id="investigate-choice:escalate-source" class="react-flow__handle react-flow__handle-right nodrag nopan graph-editor-handle graph-editor-choice-handle source connectable connectablestart connectableend connectionindicator"></div></div></li><li class="graph-editor-list__item graph-editor-spacing--p-0 graph-editor-list__item--plain"><div class="graph-editor-flex graph-editor-flex--row graph-editor-flex graph-editor-flex--align-center graph-editor-spacing--gap-1 graph-editor-min-w-0 graph-editor-spacing--py-2 graph-editor-spacing--px-2 graph-editor-w-full graph-editor-choice-row"><button type="button" class="graph-editor-choice-row-select graph-editor-text--start graph-editor-flex-grow-1 graph-editor-min-w-0 graph-editor-flex graph-editor-flex--row graph-editor-flex graph-editor-flex--align-center graph-editor-spacing--gap-1" disabled=""><span class="graph-editor-node-text-wrap min-w-0 graph-editor-flex-grow-1 graph-editor-min-w-0" title="Reimage immediately without collecting evidence">Reimage immediately without collecting evidence</span><span class="graph-editor-badge graph-editor-badge--neutral graph-editor-flex-shrink-0">reimage</span></button><div data-handleid="choice:reimage" data-nodeid="investigate" data-handlepos="right" data-id="investigate-choice:reimage-source" class="react-flow__handle react-flow__handle-right nodrag nopan graph-editor-handle graph-editor-choice-handle source connectable connectablestart connectableend connectionindicator"></div></div></li></ul></div></div></div><div class="react-flow__node react-flow__node-promptNode nopan" data-id="recovery" data-testid="rf__node-recovery" tabindex="0" role="button" aria-describedby="react-flow__node-desc-1" style="z-index: 0; transform: translate(880px, 160px); pointer-events: all; visibility: visible; width: 280px;"><div class="graph-editor-card graph-editor-rounded graph-editor-canvas-node" style="width: 100%; height: 100%; min-width: 0px; box-sizing: border-box; display: flex; flex-direction: column;"><div data-handleid="in" data-nodeid="recovery" data-handlepos="left" data-id="recovery-in-target" class="react-flow__handle react-flow__handle-left nodrag nopan graph-editor-target-handle graph-editor-target-handle--default target connectable connectablestart connectableend connectionindicator"></div><div class="graph-editor-card__header graph-editor-surface--muted graph-editor-spacing--py-2 graph-editor-spacing--px-2 graph-editor-min-w-0 graph-editor-flex-shrink-0"><div class="graph-editor-flex graph-editor-flex--between graph-editor-flex graph-editor-flex--align-start graph-editor-spacing--gap-2 graph-editor-min-w-0"><div class="graph-editor-flex graph-editor-flex--row graph-editor-flex graph-editor-flex--align-start graph-editor-spacing--gap-1 graph-editor-min-w-0 graph-editor-flex-grow-1 graph-editor-overflow-hidden"><div class="graph-editor-min-w-0 graph-editor-flex-grow-1 graph-editor-overflow-hidden"><div class="graph-editor-text--bold graph-editor-text--md">info</div></div></div><div class="graph-editor-muted graph-editor-text--xs graph-editor-flex-shrink-0">recovery</div></div></div><div class="graph-editor-canvas-node-body graph-editor-min-w-0"><div class="graph-editor-card__body graph-editor-spacing--py-2 graph-editor-spacing--px-2 graph-editor-min-w-0 nodrag"><div class="graph-editor-text--sm graph-editor-spacing--mb-0 graph-editor-node-text-wrap min-w-0" title="Notify stakeholders, document the timeline, and restore the endpoint safely.">Notify stakeholders, document the timeline, and restore the endpoint safely.</div></div><ul class="graph-editor-list graph-editor-list--flush graph-editor-text--sm graph-editor-min-w-0 nodrag" aria-label="Node choices"><li class="graph-editor-list__item graph-editor-spacing--p-0 graph-editor-list__item--plain"><div class="graph-editor-flex graph-editor-flex--row graph-editor-flex graph-editor-flex--align-center graph-editor-spacing--gap-1 graph-editor-min-w-0 graph-editor-spacing--py-2 graph-editor-spacing--px-2 graph-editor-w-full graph-editor-choice-row"><button type="button" class="graph-editor-choice-row-select graph-editor-text--start graph-editor-flex-grow-1 graph-editor-min-w-0 graph-editor-flex graph-editor-flex--row graph-editor-flex graph-editor-flex--align-center graph-editor-spacing--gap-1" disabled=""><span class="graph-editor-node-text-wrap min-w-0 graph-editor-flex-grow-1 graph-editor-min-w-0" title="Close incident">Close incident</span><span class="graph-editor-badge graph-editor-badge--neutral graph-editor-flex-shrink-0">close</span></button><div data-handleid="choice:close" data-nodeid="recovery" data-handlepos="right" data-id="recovery-choice:close-source" class="react-flow__handle react-flow__handle-right nodrag nopan graph-editor-handle graph-editor-choice-handle source connectable connectablestart connectableend connectionindicator"></div></div></li></ul></div></div></div><div class="react-flow__node react-flow__node-endNode nopan selectable" data-id="END" data-testid="rf__node-END" tabindex="0" role="button" aria-describedby="react-flow__node-desc-1" style="z-index: 0; transform: translate(1300px, 80px); pointer-events: all; visibility: visible;"><div class="graph-editor-card graph-editor-rounded graph-editor-canvas-node graph-editor-canvas-node--border-danger graph-editor-canvas-node--end-width"><div data-handleid="in" data-nodeid="END" data-handlepos="left" data-id="END-in-target" class="react-flow__handle react-flow__handle-left nodrag nopan graph-editor-target-handle graph-editor-target-handle--danger target connectable connectablestart connectableend connectionindicator"></div><div class="graph-editor-card__body graph-editor-spacing--p-2 graph-editor-text--center"><div class="graph-editor-text--bold graph-editor-text--danger">END</div><div class="graph-editor-muted graph-editor-text--sm">Outcome required</div></div></div></div></div></div></div></div><div class="react-flow__panel react-flow__controls bottom left" data-testid="rf__controls" style="pointer-events: all;"><button type="button" class="react-flow__controls-button react-flow__controls-zoomin" title="zoom in" aria-label="zoom in"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M32 18.133H18.133V32h-4.266V18.133H0v-4.266h13.867V0h4.266v13.867H32z"></path></svg></button><button type="button" class="react-flow__controls-button react-flow__controls-zoomout" title="zoom out" aria-label="zoom out"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 5"><path d="M0 0h32v4.2H0z"></path></svg></button><button type="button" class="react-flow__controls-button react-flow__controls-fitview" title="fit view" aria-label="fit view"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 30"><path d="M3.692 4.63c0-.53.4-.938.939-.938h5.215V0H4.708C2.13 0 0 2.054 0 4.63v5.216h3.692V4.631zM27.354 0h-5.2v3.692h5.17c.53 0 .984.4.984.939v5.215H32V4.631A4.624 4.624 0 0027.354 0zm.954 24.83c0 .532-.4.94-.939.94h-5.215v3.768h5.215c2.577 0 4.631-2.13 4.631-4.707v-5.139h-3.692v5.139zm-23.677.94c-.531 0-.939-.4-.939-.94v-5.138H0v5.139c0 2.577 2.13 4.707 4.708 4.707h5.138V25.77H4.631z"></path></svg></button><button type="button" class="react-flow__controls-button react-flow__controls-interactive" title="toggle interactivity" aria-label="toggle interactivity"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 32"><path d="M21.333 10.667H19.81V7.619C19.81 3.429 16.38 0 12.19 0c-4.114 1.828-1.37 2.133.305 2.438 1.676.305 4.42 2.59 4.42 5.181v3.048H3.047A3.056 3.056 0 000 13.714v15.238A3.056 3.056 0 003.048 32h18.285a3.056 3.056 0 003.048-3.048V13.714a3.056 3.056 0 00-3.048-3.047zM12.19 24.533a3.056 3.056 0 01-3.047-3.047 3.056 3.056 0 013.047-3.048 3.056 3.056 0 013.048 3.048 3.056 3.056 0 01-3.048 3.047z"></path></svg></button></div><svg xmlns="http://www.w3.org/2000/svg" class="react-flow__background" data-testid="rf__background" style="position: absolute; width: 100%; height: 100%; top: 0px; left: 0px;"><pattern id="pattern-1undefined" x="3.200000000000003" y="6.400000000000006" width="16.4" height="16.4" patternUnits="userSpaceOnUse" patternTransform="translate(-0.41,-0.41)"><circle cx="0.41" cy="0.41" r="0.41" fill="#91919a"></circle></pattern><rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-1undefined)"></rect></svg><div class="react-flow__panel react-flow__attribution bottom right" data-message="Please only hide this attribution when you are subscribed to React Flow Pro: https://reactflow.dev/pro" style="pointer-events: all;"><a href="https://reactflow.dev" target="_blank" rel="noopener noreferrer" aria-label="React Flow attribution">React Flow</a></div><div id="react-flow__node-desc-1" style="display: none;">Press enter or space to select a node.You can then use the arrow keys to move the node around. Press delete to remove it and escape to cancel. </div><div id="react-flow__edge-desc-1" style="display: none;">Press enter or space to select an edge. You can then press delete to remove it or escape to cancel.</div><div id="react-flow__aria-live-1" aria-live="assertive" aria-atomic="true" style="position: absolute; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); clip-path: inset(100%);"></div></div></div></section></main>
     </div>
   </foreignObject>

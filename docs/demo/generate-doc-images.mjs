@@ -1,9 +1,13 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { createServer } from "vite";
 import { chromium } from "playwright";
 
+const require = createRequire(import.meta.url);
 const demoRoot = new URL("./", import.meta.url);
 const outputPath = new URL("../tree-spec-example-flow.svg", import.meta.url);
+const demoStylesPath = new URL("./editor-demo.css", import.meta.url);
+const reactFlowStylesPath = require.resolve("reactflow/dist/style.css");
 const checkOnly = process.argv.includes("--check");
 
 const width = 1400;
@@ -16,19 +20,12 @@ function escapeXml(value) {
         .replaceAll(">", "&gt;");
 }
 
-async function readGeneratedStyles(page) {
-    const styles = await page.evaluate(() =>
-        Array.from(document.styleSheets)
-            .flatMap((sheet) => {
-                try {
-                    return Array.from(sheet.cssRules, (rule) => rule.cssText);
-                } catch {
-                    return [];
-                }
-            })
-            .join("\n"),
+async function readGeneratedStyles() {
+    const [reactFlowStyles, demoStyles] = await Promise.all(
+        [reactFlowStylesPath, demoStylesPath].map((path) => readFile(path, "utf8")),
     );
-    return styles.replace(/[ \t]+$/gmu, "");
+
+    return `${reactFlowStyles.trimEnd()}\n${demoStyles.trimEnd()}`;
 }
 
 function buildSvg(markup, styles) {
@@ -77,7 +74,7 @@ async function main() {
         await page.waitForTimeout(150);
 
         const markup = await page.locator("#editor-preview").evaluate((element) => element.outerHTML);
-        const styles = await readGeneratedStyles(page);
+        const styles = await readGeneratedStyles();
         const svg = buildSvg(markup, styles);
 
         if (checkOnly) {

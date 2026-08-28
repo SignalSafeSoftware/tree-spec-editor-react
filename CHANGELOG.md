@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-08-28
+
+### Fixed
+
+- Generate the live-canvas documentation SVG from versioned CSS source files instead of browser-normalized CSS so the checked-in image is reproducible on macOS and Linux CI.
+
 ## [0.2.2] - 2026-08-28
 
 ### Added
@@ -84,7 +90,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Checks and tests on every PR; Sonar **`scan`** is label-gated on PRs and runs on tag push and manual dispatch (Batch 1).
 - Publish only from manual **`main`** dispatch or **`v*`** tags (not PR labels); publish requires **`checks`**, **`tests`**, and **`scan`**.
 
-[Unreleased]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.1.3...v0.2.0
