@@ -53,6 +53,18 @@ export interface TreeSpecEditorAdapter {
     /** Persist the current TreeSpec wire (called by Save Draft + autosave). */
     updateVersion: (entityId: string, payload: { tree_spec: Record<string, unknown> }) => Promise<void>;
     /**
+     * Optional revision-aware save. Hosts may return a typed conflict without
+     * overwriting the editor; transport, refetch, and persistence remain host-owned.
+     */
+    saveVersion?: (
+        entityId: string,
+        payload: { tree_spec: Record<string, unknown> },
+        context: {
+            baselineTreeSpec: Record<string, unknown> | null;
+            localTreeSpec: Record<string, unknown>;
+        },
+    ) => Promise<TreeSpecSaveResult>;
+    /**
      * Optional server-side validation. When absent, Validate becomes a local
      * (lint-only) operation and the toolbar should hide the Validate button.
      */
@@ -82,6 +94,16 @@ export interface TreeSpecEditorAdapter {
     /** Optional audit listing. When absent, Audit is unavailable. */
     listAudit?: (entityId: string) => Promise<TreeSpecAuditEventItem[]>;
 }
+
+export type TreeSpecSaveConflict = {
+    readonly status: 'conflict';
+    readonly remoteTreeSpec: Record<string, unknown>;
+    readonly message?: string;
+};
+
+export type TreeSpecSaveResult =
+    | { readonly status: 'saved' }
+    | TreeSpecSaveConflict;
 
 /**
  * Adapter-shaped validation issue. Hosts that surface server validation should
@@ -172,6 +194,8 @@ export interface UseTreeSpecEditorState {
     loading: boolean;
     /** A `Save Draft` round-trip is in flight. */
     saving: boolean;
+    /** Typed revision conflict from an opt-in adapter save contract, if any. */
+    saveConflict: TreeSpecSaveConflict | null;
     /** A `Publish` round-trip is in flight. */
     publishing: boolean;
     /** A `Snapshot` round-trip is in flight. */

@@ -490,6 +490,7 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
     const state: UseTreeSpecEditorState = {
         loading: adapterState.loading,
         saving: adapterState.saving,
+        saveConflict: adapterState.saveConflict,
         publishing: adapterState.publishing,
         creatingSnapshot: adapterState.creatingSnapshot,
         cloning: adapterState.cloning,

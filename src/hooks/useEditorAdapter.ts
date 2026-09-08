@@ -26,6 +26,7 @@ import {
 import type {
     AdapterValidationIssue,
     GraphEditorVersionInfo,
+    TreeSpecSaveConflict,
     UseTreeSpecEditorActions,
     UseTreeSpecEditorOptions,
 } from './types.js';
@@ -43,6 +44,7 @@ export type UseEditorAdapterOptions = {
 export type UseEditorAdapterResult = {
     loading: boolean;
     saving: boolean;
+    saveConflict: TreeSpecSaveConflict | null;
     publishing: boolean;
     setPublishing: (next: boolean) => void;
     creatingSnapshot: boolean;
@@ -94,6 +96,7 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [saveConflict, setSaveConflict] = useState<TreeSpecSaveConflict | null>(null);
     const [publishing, setPublishing] = useState(false);
     const [rawTreeSpec, setRawTreeSpec] = useState<TreeSpecWire | null>(null);
     const [versionInfo, setVersionInfo] = useState<GraphEditorVersionInfo | null>(null);
@@ -241,14 +244,29 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
         setAutosaveStatus(AUTOSAVE_STATUS.SAVING);
         try {
             const compiled = compileTreeSpec(tree);
-            await adapter.updateVersion(entityId, { tree_spec: compiled });
+            const payload = { tree_spec: compiled };
+            const result = adapter.saveVersion
+                ? await adapter.saveVersion(entityId, payload, {
+                    baselineTreeSpec: rawTreeSpec,
+                    localTreeSpec: compiled,
+                })
+                : undefined;
+            if (result?.status === 'conflict') {
+                setSaveConflict(result);
+                setAutosaveStatus(AUTOSAVE_STATUS.IDLE);
+                return;
+            }
+            if (result?.status === 'saved' || result === undefined) {
+                if (!adapter.saveVersion) await adapter.updateVersion(entityId, payload);
+                setSaveConflict(null);
+            }
             setRawTreeSpec(compiled);
             lastSavedKeyRef.current = JSON.stringify(compiled);
             setAutosaveStatus(AUTOSAVE_STATUS.SAVED);
         } finally {
             setSaving(false);
         }
-    }, [adapter, entityId, isPublished, tree, lastSavedKeyRef, setAutosaveStatus]);
+    }, [adapter, entityId, isPublished, rawTreeSpec, tree, lastSavedKeyRef, setAutosaveStatus]);
 
     useEffect(() => {
         saveDraftRef.current = saveDraft;
@@ -338,6 +356,7 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
     return {
         loading,
         saving,
+        saveConflict,
         publishing,
         setPublishing,
         creatingSnapshot,

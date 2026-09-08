@@ -19,6 +19,8 @@ export type {
     AdapterValidationIssue,
     GraphEditorVersionInfo,
     TreeSpecEditorAdapter,
+    TreeSpecSaveConflict,
+    TreeSpecSaveResult,
     UseTreeSpecEditorActions,
     UseTreeSpecEditorOptions,
     UseTreeSpecEditorResult,

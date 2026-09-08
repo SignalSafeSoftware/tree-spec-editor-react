@@ -90,6 +90,16 @@ export function ExampleCanvas() {
 
 For full authoring flows (load/save/validate), compose **`useTreeSpecEditor`** with your adapter — see tests and `@signalsafe/tree-spec-editor` for a reference shell.
 
+### Revision-aware saves
+
+Adapters may implement optional `saveVersion` for optimistic-concurrency
+handling. It receives the baseline and local compiled TreeSpec and returns
+`{ status: "saved" }` or a typed `{ status: "conflict", remoteTreeSpec,
+message? }`. The hook exposes a conflict through `saveConflict` without
+overwriting local edits. Hosts own revision tokens, three-way merging,
+transport, persistence, and conflict UI; adapters that omit `saveVersion`
+continue to use the compatible `updateVersion` callback.
+
 ## Public exports
 
 | Export | Purpose |
@@ -98,6 +108,7 @@ For full authoring flows (load/save/validate), compose **`useTreeSpecEditor`** w
 | `TreeSpecGraphEditorProps` | Canvas props |
 | `useTreeSpecEditor` | Stateful editor orchestration |
 | `TreeSpecEditorAdapter`, `UseTreeSpecEditorResult`, … | Adapter and hook types |
+| `TreeSpecSaveResult`, `TreeSpecSaveConflict` | Optional typed save/conflict result |
 
 Import from `@signalsafe/tree-spec-editor-react` only (no subpath exports).
 

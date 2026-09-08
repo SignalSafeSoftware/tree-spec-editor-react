@@ -371,6 +371,34 @@ describe('useTreeSpecEditor', () => {
             expect(latest.current?.saving).toBe(false);
         });
 
+        it('surfaces an opt-in typed save conflict without updating the local baseline', async () => {
+            const saveVersion = vi.fn(async () => ({
+                status: 'conflict' as const,
+                remoteTreeSpec: buildSampleWire(),
+                message: 'Draft changed elsewhere',
+            }));
+            const adapter = buildAdapter({ saveVersion });
+            const { latest } = await mountHook({ adapter, entityId: 'v1' });
+            const before = latest.current?.rawTreeSpec;
+
+            await act(async () => {
+                await latest.current?.actions.saveDraft();
+            });
+
+            expect(saveVersion).toHaveBeenCalledWith(
+                'v1',
+                expect.objectContaining({ tree_spec: expect.any(Object) }),
+                expect.objectContaining({ baselineTreeSpec: before }),
+            );
+            expect(latest.current?.saveConflict).toEqual({
+                status: 'conflict',
+                remoteTreeSpec: buildSampleWire(),
+                message: 'Draft changed elsewhere',
+            });
+            expect(latest.current?.rawTreeSpec).toBe(before);
+            expect(adapter.updateVersion).not.toHaveBeenCalled();
+        });
+
         it('saveDraft is a no-op when published', async () => {
             const adapter = buildAdapter({
                 getVersion: vi.fn(async () => ({ tree_spec: buildSampleWire(), is_published: true })),

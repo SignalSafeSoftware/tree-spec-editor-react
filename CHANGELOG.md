@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+No unreleased changes recorded.
+
+## [0.3.0] - 2026-09-08
+
+### Added
+
+- Optional revision-aware save results with typed conflict state while keeping
+  transport, merging, and persistence in the host adapter.
+
 ## [0.2.5] - 2026-08-28
 
 ### Added
