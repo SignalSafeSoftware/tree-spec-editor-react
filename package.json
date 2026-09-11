@@ -61,7 +61,7 @@
         "test:monorepo": "cd ../../frontend && yarn vitest run --config vitest.tree-spec-editor-react.config.ts"
     },
     "dependencies": {
-        "@signalsafe/tree-spec": "^0.3.4",
+        "@signalsafe/tree-spec": "^0.4.0",
         "@signalsafe/tree-spec-editor-core": "^0.2.1"
     },
     "peerDependencies": {
