@@ -38,7 +38,7 @@ export type UseEditorHistoryResult = {
     ) => string | undefined;
 };
 
-export function useEditorHistory(isPublished: boolean): UseEditorHistoryResult {
+export function useEditorHistory(isPublished: boolean, readOnly = false): UseEditorHistoryResult {
     const [tree, setTree] = useState<EditorTree | null>(null);
     const historyRef = useRef<EditorHistoryStack>(createEditorHistoryStack());
     const copiedNodeIdRef = useRef<string | null>(null);
@@ -61,6 +61,7 @@ export function useEditorHistory(isPublished: boolean): UseEditorHistoryResult {
 
     const commitTree = useCallback(
         (next: EditorTree | null) => {
+            if (readOnly) return;
             setTree((prev) => {
                 if (prev && next && !editorTreesEqual(prev, next)) {
                     pushEditorHistory(historyRef.current, prev);
@@ -69,7 +70,7 @@ export function useEditorHistory(isPublished: boolean): UseEditorHistoryResult {
             });
             queueMicrotask(syncHistoryMeta);
         },
-        [syncHistoryMeta],
+        [syncHistoryMeta, readOnly],
     );
 
     const replaceTreeWithoutHistory = useCallback(
@@ -81,24 +82,24 @@ export function useEditorHistory(isPublished: boolean): UseEditorHistoryResult {
     );
 
     const undo = useCallback(() => {
-        if (!tree || isPublished) return false;
+        if (!tree || isPublished || readOnly) return false;
         const result = popEditorUndo(historyRef.current, tree);
         if (!result) return false;
         historyRef.current.future.unshift(result.currentSnapshot);
         setTree(result.nextTree);
         queueMicrotask(syncHistoryMeta);
         return true;
-    }, [tree, isPublished, syncHistoryMeta]);
+    }, [tree, isPublished, readOnly, syncHistoryMeta]);
 
     const redo = useCallback(() => {
-        if (!tree || isPublished) return false;
+        if (!tree || isPublished || readOnly) return false;
         const result = popEditorRedo(historyRef.current, tree);
         if (!result) return false;
         historyRef.current.past.push(result.currentSnapshot);
         setTree(result.nextTree);
         queueMicrotask(syncHistoryMeta);
         return true;
-    }, [tree, isPublished, syncHistoryMeta]);
+    }, [tree, isPublished, readOnly, syncHistoryMeta]);
 
     const copySelectedNode = useCallback((selection: GraphSelection) => {
         if (selection.kind !== GRAPH_SELECTION_KIND.NODE || !selection.id) return false;
@@ -113,7 +114,7 @@ export function useEditorHistory(isPublished: boolean): UseEditorHistoryResult {
             setSelection: (next: GraphSelection) => void,
             setFocusNodeId: (id: string | null) => void,
         ) => {
-            if (!tree || isPublished) return false;
+            if (!tree || isPublished || readOnly) return false;
             const sourceId = copiedNodeIdRef.current;
             if (!sourceId) return false;
             const duplicated = duplicateNode(tree, sourceId);
@@ -123,7 +124,7 @@ export function useEditorHistory(isPublished: boolean): UseEditorHistoryResult {
             setFocusNodeId(duplicated.nextNodeId);
             return true;
         },
-        [tree, isPublished, commitTree],
+        [tree, isPublished, readOnly, commitTree],
     );
 
     const duplicateNodeById = useCallback(
@@ -132,7 +133,7 @@ export function useEditorHistory(isPublished: boolean): UseEditorHistoryResult {
             setSelection: (next: GraphSelection) => void,
             setFocusNodeId: (id: string | null) => void,
         ) => {
-            if (!tree || isPublished) return undefined;
+            if (!tree || isPublished || readOnly) return undefined;
             const duplicated = duplicateNode(tree, nodeId);
             if (!duplicated) return undefined;
             commitTree(duplicated.nextTree);
@@ -140,7 +141,7 @@ export function useEditorHistory(isPublished: boolean): UseEditorHistoryResult {
             setFocusNodeId(duplicated.nextNodeId);
             return duplicated.nextNodeId;
         },
-        [tree, isPublished, commitTree],
+        [tree, isPublished, readOnly, commitTree],
     );
 
     return {
