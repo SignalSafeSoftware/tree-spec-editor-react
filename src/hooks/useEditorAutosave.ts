@@ -13,6 +13,7 @@ export type UseEditorAutosaveOptions = {
     tree: EditorTree | null;
     isPublished: boolean;
     saving: boolean;
+    failedSaveKey?: string | null;
     publishing: boolean;
     autosaveStatus: AutosaveStatus;
     setAutosaveStatus: (status: AutosaveStatus) => void;
@@ -28,6 +29,7 @@ export function useEditorAutosave(options: UseEditorAutosaveOptions): void {
         tree,
         isPublished,
         saving,
+        failedSaveKey = null,
         publishing,
         autosaveStatus,
         setAutosaveStatus,
@@ -45,6 +47,8 @@ export function useEditorAutosave(options: UseEditorAutosaveOptions): void {
 
         const compiled = compileTreeSpec(tree);
         const key = JSON.stringify(compiled);
+        // Preserve failure state; retry this payload explicitly, or autosave a new edit.
+        if (key === failedSaveKey) return;
         if (key === lastSavedKeyRef.current) {
             if (autosaveStatus !== AUTOSAVE_STATUS.SAVED) setAutosaveStatus(AUTOSAVE_STATUS.IDLE);
             return;
@@ -62,5 +66,5 @@ export function useEditorAutosave(options: UseEditorAutosaveOptions): void {
         // NOTE: autosaveStatus is intentionally NOT in deps. The dirty/idle
         // bookkeeping above flips status, and re-running the effect on every
         // status change would reset the debounce timer.
-    }, [tree, entityId, isPublished, saving, publishing, autosaveDebounceMs, enableAutosave]);
+    }, [tree, entityId, isPublished, saving, failedSaveKey, publishing, autosaveDebounceMs, enableAutosave]);
 }

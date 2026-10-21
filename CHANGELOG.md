@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 No unreleased changes recorded.
 
+## [0.3.3] - 2026-10-21
+
+### Changed
+
+- Add optional read-only editing gates and observable save failures while retaining unsaved changes and avoiding automatic retries of the same failed payload. Preserve the audited hook/type boundaries and require TreeSpec `^0.4.4` and editor-core `^0.2.3`.
+- Refresh current README, release preparation and package compatibility documentation.
+
+## [0.3.3-r42.1] - 2026-10-18
+
+### Added
+
+- Explicit hook `readOnly` capability and effective `state.readOnly`, independent of actual publication metadata. Blocks graph edits, history mutations, persistence actions and autosave; selection, preview and validation remain available.
+- Optional `onSaveError(error: unknown)` observer and nullable `state.saveError`. Failed saves resolve safely for void toolbar/shortcut callers, preserve unsaved graph and saved baseline, and report existing dirty status. Observer failures are contained.
+
+### Fixed
+
+- Keep the failed payload unsaved without silently retrying it on an autosave state rerender. Explicit Save can retry; a new edit may schedule a new autosave.
+
+This is an isolated local candidate; no registry release or host adoption is implied.
+
 ## [0.3.2] - 2026-10-09
 
 ### Changed
@@ -129,7 +149,7 @@ No unreleased changes recorded.
 - Checks and tests on every PR; Sonar **`scan`** is label-gated on PRs and runs on tag push and manual dispatch (Batch 1).
 - Publish only from manual **`main`** dispatch or **`v*`** tags (not PR labels); publish requires **`checks`**, **`tests`**, and **`scan`**.
 
-[Unreleased]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.3.2...HEAD
 [0.3.1]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.5...v0.3.0
 [0.2.5]: https://github.com/SignalSafeSoftware/tree-spec-editor-react/compare/v0.2.4...v0.2.5

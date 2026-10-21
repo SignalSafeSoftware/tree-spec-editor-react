@@ -1,5 +1,7 @@
 # @signalsafe/tree-spec-editor-react
 
+Current source and planned customer-subdomain impact: [current-state summary](docs/current-release-candidate.md).
+
 Headless **React + React Flow** layer for the SignalSafe TreeSpec graph editor: canvas component, orchestration hook, and wiring to `@signalsafe/tree-spec-editor-core`.
 
 | | |
@@ -169,3 +171,16 @@ See [SECURITY.md](./SECURITY.md). Host applications must authenticate users, aut
 
 - [`@signalsafe/tree-spec-editor-core`](https://github.com/SignalSafeSoftware/tree-spec-editor-core) — framework-agnostic editor helpers.
 - [`@signalsafe/tree-spec-editor`](https://github.com/SignalSafeSoftware/tree-spec-editor) — UI-kit agnostic authoring shell (panels, modals, toolbar).
+
+
+### Explicit read-only and failed saves (local 0.3.3-r42.1 candidate)
+
+`useTreeSpecEditor` accepts optional `readOnly?: boolean` and `onSaveError?: (error: unknown) => void`. Default editing behavior is unchanged. Pass explicit readOnly for retained definitions that cannot be edited even when `is_published` is false. Bind canvas/inspector editing controls to returned `readOnly`; display publication metadata from returned `isPublished`. Explicit readOnly blocks graph/history changes and save/publish/snapshot/restore/clone writes, including keyboard and autosave paths. Selection, preview, validation and read-only inspection remain available. Already dispatched network writes cannot be cancelled by changing this option.
+
+Save failures retain the local graph and saved baseline, clear `saving`, set existing autosave status `dirty`, expose nullable `saveError`, and invoke the optional error observer with the original rejection. A null/undefined rejection becomes a generic Error in state. Save resolves after failure so void toolbar/keyboard callers do not produce an unhandled rejection; observer rejection is contained too. Retry explicitly with Save; success clears saveError and marks saved. The same failed payload is not silently autosaved again; a new edit may debounce normally. The host owns failure wording, command recovery and authorization.
+
+## Release and compatibility
+
+Release `0.3.3` preserves the installed Step 5 editor capabilities and the verified audit fixes. The coordinated dependency floor is TreeSpec `^0.4.4`, editor-core `^0.2.3`, and editor-react `^0.3.3` where declared. React integrations retain React 18 / React Flow 11. See [release preparation](./RELEASING.md) for verification and publication order. The coordinated release was approved on 2026-10-21; registry availability is recorded in release verification receipts.
+
+See the [current release documentation](docs/current-release-candidate.md) for release-specific compatibility and verification boundaries.

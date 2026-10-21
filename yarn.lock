@@ -214,18 +214,18 @@
   resolved "https://registry.yarnpkg.com/@rolldown/pluginutils/-/pluginutils-1.0.1.tgz#e3fcee093fbb5ce765e1ad088ff4de2889f6f9be"
   integrity sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==
 
-"@signalsafe/tree-spec-editor-core@^0.2.2":
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/@signalsafe/tree-spec-editor-core/-/tree-spec-editor-core-0.2.2.tgz#9cc87e15c559d3ebae61549f77348d34e659e721"
-  integrity sha512-ruTcYYnNMIBRaRsvmrK0EouJhDUadu+qieVpwjNEzgnfHXrFyqJsUCcTj0g10BqmpNPV/2ywnA2OVFxw2Z5bcQ==
+"@signalsafe/tree-spec-editor-core@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@signalsafe/tree-spec-editor-core/-/tree-spec-editor-core-0.2.3.tgz#2b27241e941ccbcc93882ed5cf5b2b402c83d7b3"
+  integrity sha512-EQzdmTL7D6W9570jUWXrbJj6mW2k+XRS2i4I/iAQMX0bQTi88lEUfv2Z5jN7To9VO9QPliNgNVjV8jdeaUQqiA==
   dependencies:
-    "@signalsafe/tree-spec" "^0.4.1"
+    "@signalsafe/tree-spec" "^0.4.4"
     dagre "^0.8.5"
 
-"@signalsafe/tree-spec@^0.4.1":
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/@signalsafe/tree-spec/-/tree-spec-0.4.2.tgz#ac6d24bc51f82d19e4750e5be319efab70b81f19"
-  integrity sha512-WwcqgjgNCDsLHOaxsH2cA6UklavidR09AFrpbK45hfhLcwV45VwhSoXB/lx2kD51VRdriRgM1fXjZd1o+WAuAA==
+"@signalsafe/tree-spec@^0.4.4":
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/@signalsafe/tree-spec/-/tree-spec-0.4.4.tgz#b9720c686a8753970f0b9cd8a5205ca4e737ce99"
+  integrity sha512-e3As4cqN2x+Tha3iRtce0FVgeLuwJ3Of16h492dCz6SIaoD7WgR1Intt1HjC9BZRhysx2ocVK5uonfw12J73Rw==
 
 "@types/chai@^5.2.2":
   version "5.2.3"

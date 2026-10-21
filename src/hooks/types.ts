@@ -138,6 +138,10 @@ export interface UseTreeSpecEditorOptions {
     autosaveDebounceMs?: number;
     /** Enable/disable autosave entirely. Default `true`. */
     enableAutosave?: boolean;
+    /** Prevent all graph changes and persistence writes without changing publication metadata. */
+    readOnly?: boolean;
+    /** Save failures resolve safely, retain unsaved state and notify this optional observer. */
+    onSaveError?: (error: unknown) => void;
     /** Enable/disable the global keyboard shortcut listener. Default `true`. */
     enableKeyboardShortcuts?: boolean;
     /**
@@ -190,12 +194,16 @@ export interface UseTreeSpecEditorOptions {
 
 /** Mutable editor state surfaced by {@link useTreeSpecEditor}. */
 export interface UseTreeSpecEditorState {
+    /** Effective editing gate: explicit readOnly or actual publication. */
+    readOnly: boolean;
     /** Loading the entity from the adapter. `true` until first load resolves or rejects. */
     loading: boolean;
     /** A `Save Draft` round-trip is in flight. */
     saving: boolean;
     /** Typed revision conflict from an opt-in adapter save contract, if any. */
     saveConflict: TreeSpecSaveConflict | null;
+    /** Last save failure; null before a save attempt or after success/conflict. */
+    saveError: unknown | null;
     /** A `Publish` round-trip is in flight. */
     publishing: boolean;
     /** A `Snapshot` round-trip is in flight. */

@@ -1503,3 +1503,311 @@ describe('useTreeSpecEditor', () => {
         });
     });
 });
+
+describe('explicit readOnly and caught save errors', () => {
+    afterEach(() => {
+        vi.useRealTimers();
+        vi.restoreAllMocks();
+    });
+
+    it.each(['updateVersion', 'saveVersion'] as const)(
+        'contains %s rejection and retries the unchanged unsaved graph',
+        async (method) => {
+            const error = new Error('Save rejected');
+            const onSaveError = vi.fn();
+            const adapter = buildAdapter();
+            if (method === 'saveVersion')
+                adapter.saveVersion = vi
+                    .fn()
+                    .mockRejectedValueOnce(error)
+                    .mockResolvedValue({ status: 'saved' });
+            else
+                adapter.updateVersion = vi
+                    .fn()
+                    .mockRejectedValueOnce(error)
+                    .mockResolvedValue(undefined);
+            const hook = await mountHook({
+                adapter,
+                entityId: 'v1',
+                enableAutosave: false,
+                onSaveError,
+            });
+            const baseline = hook.latest.current!.rawTreeSpec;
+            await act(async () => {
+                hook.latest.current!.actions.addNodeOfType('prompt');
+            });
+            const unsaved = hook.latest.current!.tree;
+            await act(async () => {
+                await expect(hook.latest.current!.actions.saveDraft()).resolves.toBeUndefined();
+            });
+            expect(hook.latest.current!.saving).toBe(false);
+            expect(hook.latest.current!.autosaveStatus).toBe(AUTOSAVE_STATUS.DIRTY);
+            expect(hook.latest.current!.rawTreeSpec).toBe(baseline);
+            expect(hook.latest.current!.tree).toBe(unsaved);
+            expect(onSaveError).toHaveBeenCalledExactlyOnceWith(error);
+            expect(hook.latest.current!.saveError).toBe(error);
+            await act(async () => {
+                await hook.latest.current!.actions.saveDraft();
+            });
+            expect(hook.latest.current!.autosaveStatus).toBe(AUTOSAVE_STATUS.SAVED);
+            expect(onSaveError).toHaveBeenCalledTimes(1);
+            expect(hook.latest.current!.saveError).toBeNull();
+            hook.unmount();
+        },
+    );
+
+    it('contains failing observers for a void Save caller without unhandled rejection', async () => {
+        const adapter = buildAdapter({ updateVersion: vi.fn().mockRejectedValue('offline') });
+        const hook = await mountHook({
+            adapter,
+            entityId: 'v1',
+            enableAutosave: false,
+            onSaveError: async () => {
+                throw new Error('observer');
+            },
+        });
+        await act(async () => {
+            void hook.latest.current!.actions.saveDraft();
+            await Promise.resolve();
+        });
+        expect(hook.latest.current!.autosaveStatus).toBe(AUTOSAVE_STATUS.DIRTY);
+        expect(hook.latest.current!.saving).toBe(false);
+        hook.unmount();
+    });
+
+    it('blocks every graph/persistence action for an unpublished retained definition', async () => {
+        vi.useFakeTimers();
+        const adapter = buildAdapter({
+            publish: vi.fn(),
+            createSnapshot: vi.fn(),
+            listSnapshots: vi.fn(async () => []),
+            restoreSnapshot: vi.fn(),
+            cloneToDraft: vi.fn(),
+        });
+        const hook = await mountHook({
+            adapter,
+            entityId: 'v1',
+            readOnly: true,
+            autosaveDebounceMs: 10,
+        });
+        const original = hook.latest.current!.tree!;
+        await act(async () => {
+            hook.latest.current!.actions.setSelection({
+                kind: GRAPH_SELECTION_KIND.NODE,
+                id: 'n1',
+            });
+        });
+        await act(async () => {
+            const a = hook.latest.current!.actions;
+            a.setTree({ ...original, nodes: {} });
+            a.addNodeOfType('prompt');
+            a.autoLayout();
+            a.insertTemplate({
+                focusSlot: 'focus',
+                nodes: {
+                    focus: {
+                        type: 'prompt',
+                        prompt: 'Template',
+                        choices: [],
+                        offset: { x: 0, y: 0 },
+                    },
+                },
+                transitions: [],
+            });
+            a.updateSelectedNode({ prompt: 'changed' });
+            a.addChoice();
+            a.setChoiceType('c1', 'renamed');
+            a.deleteChoice('c1');
+            a.moveChoice('c1', 'down');
+            a.repositionChoice('n1', 'c1', 'n1', 0);
+            a.setChoiceTarget('c1', END_NODE_ID);
+            a.setChoiceOutcome('c1', 'safe');
+            a.updateChoiceEdgeHints('n1', 'c1', {});
+            a.setDefaultEdgeType('smoothstep');
+            expect(a.deleteNodeById('n1')).toBe(false);
+            expect(a.deleteSelectedNode()).toBe(false);
+            a.copySelectedNode();
+            expect(a.pasteCopiedNode()).toBe(false);
+            expect(a.duplicateNodeById('n1')).toBeUndefined();
+            expect(a.undo()).toBe(false);
+            expect(a.redo()).toBe(false);
+            await a.saveDraft();
+            await a.publish();
+            await a.createSnapshot();
+            await a.restoreSnapshot('snapshot');
+            await a.cloneToDraft();
+            await vi.advanceTimersByTimeAsync(50);
+        });
+        expect(hook.latest.current!.tree).toBe(original);
+        expect(hook.latest.current!.isPublished).toBe(false);
+        expect(hook.latest.current!.readOnly).toBe(true);
+        for (const method of [
+            adapter.updateVersion,
+            adapter.publish,
+            adapter.createSnapshot,
+            adapter.restoreSnapshot,
+            adapter.cloneToDraft,
+        ])
+            expect(method).not.toHaveBeenCalled();
+        hook.unmount();
+    });
+
+    it('cancels pending autosave on readOnly change and unmount; defaults remain editable', async () => {
+        vi.useFakeTimers();
+        const adapter = buildAdapter();
+        const hook = await mountHook({ adapter, entityId: 'v1', autosaveDebounceMs: 10 });
+        expect(hook.latest.current!.readOnly).toBe(false);
+        await act(async () => {
+            hook.latest.current!.actions.addNodeOfType('prompt');
+        });
+        expect(Object.keys(hook.latest.current!.tree!.nodes)).toHaveLength(2);
+        await hook.rerender({ adapter, entityId: 'v1', readOnly: true, autosaveDebounceMs: 10 });
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(20);
+        });
+        expect(adapter.updateVersion).not.toHaveBeenCalled();
+        await hook.rerender({ adapter, entityId: 'v1', readOnly: false, autosaveDebounceMs: 10 });
+        hook.unmount();
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(20);
+        });
+        expect(adapter.updateVersion).not.toHaveBeenCalled();
+    });
+});
+
+describe('readOnly shortcut boundary', () => {
+    it('blocks void Save and graph shortcuts, retains preview, and removes its listener', async () => {
+        const listeners = new Set<EventListenerOrEventListenerObject>();
+        vi.stubGlobal('HTMLElement', class {});
+        vi.stubGlobal(
+            'addEventListener',
+            (_type: string, listener: EventListenerOrEventListenerObject) => {
+                listeners.add(listener);
+            },
+        );
+        vi.stubGlobal(
+            'removeEventListener',
+            (_type: string, listener: EventListenerOrEventListenerObject) => {
+                listeners.delete(listener);
+            },
+        );
+        try {
+            const adapter = buildAdapter();
+            const onPreview = vi.fn();
+            const hook = await mountHook({ adapter, entityId: 'v1', readOnly: true, onPreview });
+            const original = hook.latest.current!.tree;
+            await act(async () => {
+                for (const key of ['s', 'd', 'Delete', 'z', 'v', 'p']) {
+                    for (const listener of [...listeners]) {
+                        if (typeof listener === 'function')
+                            listener({
+                                key,
+                                ctrlKey: true,
+                                metaKey: false,
+                                shiftKey: false,
+                                target: null,
+                                preventDefault: vi.fn(),
+                            } as unknown as Event);
+                    }
+                }
+            });
+            expect(adapter.updateVersion).not.toHaveBeenCalled();
+            expect(hook.latest.current!.tree).toBe(original);
+            expect(onPreview).toHaveBeenCalledTimes(1);
+            await act(async () => {
+                hook.unmount();
+            });
+            expect(listeners.size).toBe(0);
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+});
+
+describe('failed autosave recovery', () => {
+    afterEach(() => {
+        vi.useRealTimers();
+        vi.restoreAllMocks();
+    });
+    it('holds the failed payload without hidden retries and autosaves a new edit', async () => {
+        vi.useFakeTimers();
+        const adapter = buildAdapter({
+            updateVersion: vi.fn().mockRejectedValueOnce(null).mockResolvedValue(undefined),
+        });
+        const onSaveError = vi.fn();
+        const hook = await mountHook({
+            adapter,
+            entityId: 'v1',
+            autosaveDebounceMs: 10,
+            onSaveError,
+        });
+        await act(async () => {
+            hook.latest.current!.actions.addNodeOfType('prompt');
+        });
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(15);
+        });
+        expect(hook.latest.current!.saveError).toBeInstanceOf(Error);
+        expect(hook.latest.current!.autosaveStatus).toBe(AUTOSAVE_STATUS.DIRTY);
+        expect(onSaveError).toHaveBeenCalledWith(null);
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(100);
+        });
+        expect(adapter.updateVersion).toHaveBeenCalledTimes(1);
+        await act(async () => {
+            hook.latest.current!.actions.addNodeOfType('prompt');
+        });
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(15);
+        });
+        expect(adapter.updateVersion).toHaveBeenCalledTimes(2);
+        expect(hook.latest.current!.saveError).toBeNull();
+        expect(hook.latest.current!.autosaveStatus).toBe(AUTOSAVE_STATUS.SAVED);
+        hook.unmount();
+    });
+});
+
+describe('save failure state ownership', () => {
+    it('does not present a previous conflict as the result of a later failed Save', async () => {
+        const error = new Error('offline');
+        const adapter = buildAdapter({
+            saveVersion: vi
+                .fn()
+                .mockResolvedValueOnce({ status: 'conflict', remoteTreeSpec: buildSampleWire() })
+                .mockRejectedValueOnce(error),
+        });
+        const hook = await mountHook({ adapter, entityId: 'v1', enableAutosave: false });
+        await act(async () => {
+            await hook.latest.current!.actions.saveDraft();
+        });
+        expect(hook.latest.current!.saveConflict?.status).toBe('conflict');
+        await act(async () => {
+            await hook.latest.current!.actions.saveDraft();
+        });
+        expect(hook.latest.current!.saveConflict).toBeNull();
+        expect(hook.latest.current!.saveError).toBe(error);
+        await hook.rerender({ adapter, entityId: 'v2', enableAutosave: false });
+        expect(hook.latest.current!.saveError).toBeNull();
+        hook.unmount();
+    });
+});
+
+describe('nonblocking error observer', () => {
+    it('clears saving even when an optional observer never settles', async () => {
+        const adapter = buildAdapter({
+            updateVersion: vi.fn().mockRejectedValue(new Error('offline')),
+        });
+        const hook = await mountHook({
+            adapter,
+            entityId: 'v1',
+            enableAutosave: false,
+            onSaveError: () => new Promise<void>(() => {}),
+        });
+        await act(async () => {
+            await hook.latest.current!.actions.saveDraft();
+        });
+        expect(hook.latest.current!.saving).toBe(false);
+        expect(hook.latest.current!.saveError).toBeInstanceOf(Error);
+        hook.unmount();
+    });
+});

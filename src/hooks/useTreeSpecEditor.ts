@@ -70,6 +70,7 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
         entityId,
         autosaveDebounceMs = DEFAULT_AUTOSAVE_DEBOUNCE_MS,
         enableAutosave = true,
+        readOnly = false,
         enableKeyboardShortcuts = true,
         computeRuntimeIssues,
         debugMode = false,
@@ -80,7 +81,7 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
     const [autosaveStatus, setAutosaveStatus] = useState<AutosaveStatus>(AUTOSAVE_STATUS.IDLE);
     const [isPublished, setIsPublished] = useState(false);
 
-    const history = useEditorHistory(isPublished);
+    const history = useEditorHistory(isPublished, readOnly);
     const {
         tree,
         canUndo,
@@ -124,12 +125,13 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
     } = selectionState;
 
     useEditorAutosave({
-        enableAutosave,
+        enableAutosave: enableAutosave && !readOnly,
         autosaveDebounceMs,
         entityId,
         tree,
         isPublished,
         saving: adapterState.saving,
+        failedSaveKey: adapterState.failedSaveKey,
         publishing: adapterState.publishing,
         autosaveStatus,
         setAutosaveStatus,
@@ -174,12 +176,12 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
     }, [adapterState.localIssues, adapterState.serverIssues, runtimeIssues, debugMode]);
 
     const canPublish = useMemo(
-        () => !issues.some((i) => i.severity === TREE_SPEC_ISSUE_SEVERITY.ERROR),
-        [issues],
+        () => !readOnly && !issues.some((i) => i.severity === TREE_SPEC_ISSUE_SEVERITY.ERROR),
+        [issues, readOnly],
     );
 
     const publish = useCallback<UseTreeSpecEditorActions['publish']>(async () => {
-        if (!entityId || !tree || !adapter.publish) return;
+        if (readOnly || !entityId || !tree || !adapter.publish) return;
         adapterState.setPublishing(true);
         try {
             const compiled = compileTreeSpec(tree);
@@ -191,7 +193,7 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
         } finally {
             adapterState.setPublishing(false);
         }
-    }, [adapter, adapterState, canPublish, entityId, tree]);
+    }, [adapter, adapterState, canPublish, entityId, tree, readOnly]);
 
     const [nodeSearch, setNodeSearch] = useState('');
     const [issueSearch, setIssueSearch] = useState('');
@@ -199,7 +201,7 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
 
     const addNodeOfType = useCallback<UseTreeSpecEditorActions['addNodeOfType']>(
         (type, patch) => {
-            if (!tree) return undefined;
+            if (readOnly || !tree) return undefined;
             const id = `n_${safeUUID().slice(0, 8)}`;
             const p = getNextSpawnPosition(tree);
             const nextNode: EditorNode = {
@@ -214,24 +216,24 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
             setFocusNodeId(id);
             return id;
         },
-        [tree, commitTree, setSelection, setFocusNodeId],
+        [tree, readOnly, commitTree, setSelection, setFocusNodeId],
     );
 
     const autoLayout = useCallback<UseTreeSpecEditorActions['autoLayout']>(() => {
-        if (!tree) return;
+        if (readOnly || !tree) return;
         commitTree(autoLayoutTree(tree));
         triggerResetView();
-    }, [tree, commitTree, triggerResetView]);
+    }, [tree, readOnly, commitTree, triggerResetView]);
 
     const insertTemplate = useCallback<UseTreeSpecEditorActions['insertTemplate']>(
         (spec: TreeTemplateSpec) => {
-            if (!tree) return;
+            if (readOnly || !tree) return;
             const { nextTree, focusNodeId: spawnedFocusNodeId } = applyTreeTemplate(tree, spec);
             commitTree(nextTree);
             setSelection({ kind: GRAPH_SELECTION_KIND.NODE, id: spawnedFocusNodeId });
             setFocusNodeId(spawnedFocusNodeId);
         },
-        [tree, commitTree, setSelection, setFocusNodeId],
+        [tree, readOnly, commitTree, setSelection, setFocusNodeId],
     );
 
     const copySelectedNode = useCallback<UseTreeSpecEditorActions['copySelectedNode']>(
@@ -251,23 +253,23 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
 
     const updateSelectedNode = useCallback<UseTreeSpecEditorActions['updateSelectedNode']>(
         (patch) => {
-            if (!tree || !selectedNode) return;
+            if (readOnly || !tree || !selectedNode) return;
             const next: EditorNode = { ...selectedNode, ...patch };
             commitTree({ ...tree, nodes: { ...tree.nodes, [selectedNode.id]: next } });
         },
-        [tree, selectedNode, commitTree],
+        [tree, readOnly, selectedNode, commitTree],
     );
 
     const addChoice = useCallback<UseTreeSpecEditorActions['addChoice']>(() => {
-        if (!tree || !selectedNode) return;
+        if (readOnly || !tree || !selectedNode) return;
         const choiceId = `c_${safeUUID().slice(0, 6)}`;
         const nextChoice: EditorChoice = { id: choiceId, label: 'New choice' };
         updateSelectedNode({ choices: [...(selectedNode.choices ?? []), nextChoice] });
-    }, [tree, selectedNode, updateSelectedNode]);
+    }, [tree, readOnly, selectedNode, updateSelectedNode]);
 
     const setChoiceType = useCallback<UseTreeSpecEditorActions['setChoiceType']>(
         (choiceId, typeId, defaultLabel) => {
-            if (!tree || !selectedNode) return;
+            if (readOnly || !tree || !selectedNode) return;
             const next = renameNodeChoiceId(tree, selectedNode.id, choiceId, typeId);
             if (!next) return;
 
@@ -290,12 +292,12 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
                 selectChoice(selectedNode.id, typeId);
             }
         },
-        [tree, selectedNode, commitTree, focusChoiceId, selectChoice],
+        [tree, readOnly, selectedNode, commitTree, focusChoiceId, selectChoice],
     );
 
     const deleteChoice = useCallback<UseTreeSpecEditorActions['deleteChoice']>(
         (choiceId) => {
-            if (!tree || !selectedNode) return;
+            if (readOnly || !tree || !selectedNode) return;
             const nextChoices = (selectedNode.choices ?? []).filter((c: EditorChoice) => c.id !== choiceId);
             const nextTree = deleteTransitionsForChoice(tree, selectedNode.id, choiceId);
             commitTree({
@@ -306,12 +308,12 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
                 },
             });
         },
-        [tree, selectedNode, commitTree],
+        [tree, readOnly, selectedNode, commitTree],
     );
 
     const moveChoice = useCallback<UseTreeSpecEditorActions['moveChoice']>(
         (choiceId, direction) => {
-            if (!tree || !selectedNode) return;
+            if (readOnly || !tree || !selectedNode) return;
             const nextChoices = moveNodeChoice(selectedNode.choices ?? [], choiceId, direction);
             if (!nextChoices) return;
             commitTree({
@@ -322,23 +324,23 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
                 },
             });
         },
-        [tree, selectedNode, commitTree],
+        [tree, readOnly, selectedNode, commitTree],
     );
 
     const repositionChoice = useCallback<UseTreeSpecEditorActions['repositionChoice']>(
         (fromNodeId, choiceId, toNodeId, toIndex) => {
-            if (!tree) return;
+            if (readOnly || !tree) return;
             const next = moveChoiceInTree(tree, fromNodeId, choiceId, toNodeId, toIndex);
             if (!next) return;
             commitTree(next);
             selectChoice(toNodeId, choiceId);
         },
-        [tree, commitTree, selectChoice],
+        [tree, readOnly, commitTree, selectChoice],
     );
 
     const setChoiceTarget = useCallback<UseTreeSpecEditorActions['setChoiceTarget']>(
         (choiceId, targetNodeId) => {
-            if (!tree || !selectedNode) return;
+            if (readOnly || !tree || !selectedNode) return;
             const existing = getTransition(tree, selectedNode.id, choiceId);
             const next: EditorTransition = {
                 id: existing?.id ?? safeUUID(),
@@ -352,12 +354,12 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
             };
             commitTree(upsertTransition(tree, next));
         },
-        [tree, selectedNode, commitTree],
+        [tree, readOnly, selectedNode, commitTree],
     );
 
     const setChoiceOutcome = useCallback<UseTreeSpecEditorActions['setChoiceOutcome']>(
         (choiceId, outcome) => {
-            if (!tree || !selectedNode) return;
+            if (readOnly || !tree || !selectedNode) return;
             const existing = getTransition(tree, selectedNode.id, choiceId);
             if (!existing) return;
             if (existing.toNodeId !== END_NODE_ID) return;
@@ -369,12 +371,12 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
                 return;
             commitTree(upsertTransition(tree, { ...existing, outcome }));
         },
-        [tree, selectedNode, commitTree],
+        [tree, readOnly, selectedNode, commitTree],
     );
 
     const updateChoiceEdgeHints = useCallback<UseTreeSpecEditorActions['updateChoiceEdgeHints']>(
         (nodeId, choiceId, patch) => {
-            if (!tree) return;
+            if (readOnly || !tree) return;
             const node = tree.nodes[nodeId];
             if (!node) return;
             const choices = (node.choices ?? []).map((choice: EditorChoice) =>
@@ -388,20 +390,20 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
                 },
             });
         },
-        [tree, commitTree],
+        [tree, readOnly, commitTree],
     );
 
     const setDefaultEdgeType = useCallback<UseTreeSpecEditorActions['setDefaultEdgeType']>(
         (edgeType: GraphEditorEdgeType) => {
-            if (!tree) return;
+            if (readOnly || !tree) return;
             commitTree(patchGraphEditorMeta(tree, { default_edge_type: edgeType }));
         },
-        [tree, commitTree],
+        [tree, readOnly, commitTree],
     );
 
     const deleteNodeById = useCallback<UseTreeSpecEditorActions['deleteNodeById']>(
         (nodeId: string) => {
-            if (!tree || isPublished) return false;
+            if (readOnly || !tree || isPublished) return false;
             const nextTree = deleteNode(tree, nodeId);
             if (!nextTree) return false;
             commitTree(nextTree);
@@ -418,6 +420,7 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
         },
         [
             tree,
+            readOnly,
             isPublished,
             selection,
             focusNodeId,
@@ -444,13 +447,13 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
                 canUndo,
                 canRedo,
                 hasCopiedNode,
-                isPublished,
+                isPublished: isPublished || readOnly,
             });
 
             dispatchEditorKeyboardShortcut(shortcutAction, e, {
                 tree,
                 selection,
-                isPublished,
+                isPublished: isPublished || readOnly,
                 onPreview,
                 undo,
                 redo,
@@ -476,6 +479,7 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
         canRedo,
         hasCopiedNode,
         isPublished,
+        readOnly,
         undo,
         redo,
         copySelectedNode,
@@ -488,9 +492,11 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
     ]);
 
     const state: UseTreeSpecEditorState = {
+        readOnly: readOnly || isPublished,
         loading: adapterState.loading,
         saving: adapterState.saving,
         saveConflict: adapterState.saveConflict,
+        saveError: adapterState.saveError,
         publishing: adapterState.publishing,
         creatingSnapshot: adapterState.creatingSnapshot,
         cloning: adapterState.cloning,
@@ -526,8 +532,8 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
         showDraftHistory: adapterState.showDraftHistory,
         showAudit: adapterState.showAudit,
         showPublishModal: adapterState.showPublishModal,
-        canUndo,
-        canRedo,
+        canUndo: canUndo && !readOnly,
+        canRedo: canRedo && !readOnly,
         hasCopiedNode,
     };
 

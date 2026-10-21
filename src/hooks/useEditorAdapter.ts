@@ -66,6 +66,8 @@ export type UseEditorAdapterResult = {
     showPublishModal: boolean;
     setShowPublishModal: (next: boolean) => void;
     validate: UseTreeSpecEditorActions['validate'];
+    saveError: unknown | null;
+    failedSaveKey: string | null;
     saveDraft: UseTreeSpecEditorActions['saveDraft'];
     createSnapshot: UseTreeSpecEditorActions['createSnapshot'];
     restoreSnapshot: UseTreeSpecEditorActions['restoreSnapshot'];
@@ -96,6 +98,8 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [saveError, setSaveError] = useState<unknown | null>(null);
+    const [failedSaveKey, setFailedSaveKey] = useState<string | null>(null);
     const [saveConflict, setSaveConflict] = useState<TreeSpecSaveConflict | null>(null);
     const [publishing, setPublishing] = useState(false);
     const [rawTreeSpec, setRawTreeSpec] = useState<TreeSpecWire | null>(null);
@@ -128,6 +132,8 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
         async function load() {
             if (!entityId) return;
             setLoading(true);
+            setSaveError(null);
+            setFailedSaveKey(null);
             setVersionInfo(null);
             try {
                 const raw = await adapter.getVersion(entityId);
@@ -239,11 +245,15 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
 
     const saveDraft = useCallback<UseTreeSpecEditorActions['saveDraft']>(async () => {
         if (!entityId || !tree) return;
-        if (isPublished) return;
+        if (isPublished || options.readOnly) return;
+        setSaveError(null);
+        setFailedSaveKey(null);
+        let attemptedKey: string | null = null;
         setSaving(true);
         setAutosaveStatus(AUTOSAVE_STATUS.SAVING);
         try {
             const compiled = compileTreeSpec(tree);
+            attemptedKey = JSON.stringify(compiled);
             const payload = { tree_spec: compiled };
             const result = adapter.saveVersion
                 ? await adapter.saveVersion(entityId, payload, {
@@ -263,10 +273,21 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
             setRawTreeSpec(compiled);
             lastSavedKeyRef.current = JSON.stringify(compiled);
             setAutosaveStatus(AUTOSAVE_STATUS.SAVED);
+        } catch (error: unknown) {
+            setSaveConflict(null);
+            setSaveError(error ?? new Error('Save failed'));
+            setFailedSaveKey(attemptedKey);
+            setAutosaveStatus(AUTOSAVE_STATUS.DIRTY);
+            // Error observers must not reintroduce rejection into void UI callers.
+            try {
+                void Promise.resolve(options.onSaveError?.(error)).catch(() => undefined);
+            } catch {
+                // The original save remains failed even if its observer fails too.
+            }
         } finally {
             setSaving(false);
         }
-    }, [adapter, entityId, isPublished, rawTreeSpec, tree, lastSavedKeyRef, setAutosaveStatus]);
+    }, [adapter, entityId, isPublished, rawTreeSpec, tree, lastSavedKeyRef, setAutosaveStatus, options.readOnly, options.onSaveError]);
 
     useEffect(() => {
         saveDraftRef.current = saveDraft;
@@ -291,7 +312,7 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
     }, [adapter, showDraftHistory, entityId]);
 
     const createSnapshot = useCallback<UseTreeSpecEditorActions['createSnapshot']>(async () => {
-        if (!entityId || !tree || !adapter.createSnapshot || !adapter.listSnapshots) return;
+        if (options.readOnly || !entityId || !tree || !adapter.createSnapshot || !adapter.listSnapshots) return;
         setCreatingSnapshot(true);
         try {
             const compiled = compileTreeSpec(tree) as Record<string, unknown>;
@@ -301,11 +322,11 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
         } finally {
             setCreatingSnapshot(false);
         }
-    }, [adapter, entityId, tree]);
+    }, [adapter, entityId, tree, options.readOnly]);
 
     const restoreSnapshot = useCallback<UseTreeSpecEditorActions['restoreSnapshot']>(
         async (snapshotId) => {
-            if (!entityId || !adapter.restoreSnapshot) return;
+            if (options.readOnly || !entityId || !adapter.restoreSnapshot) return;
             setRestoringSnapshotId(snapshotId);
             try {
                 const { tree_spec: rawSpec } = await adapter.restoreSnapshot(entityId, snapshotId);
@@ -321,7 +342,7 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
                 setRestoringSnapshotId(null);
             }
         },
-        [adapter, coerceRawSpec, entityId, replaceTreeWithoutHistory, lastSavedKeyRef, setAutosaveStatus],
+        [adapter, coerceRawSpec, entityId, replaceTreeWithoutHistory, lastSavedKeyRef, setAutosaveStatus, options.readOnly],
     );
 
     useEffect(() => {
@@ -343,7 +364,7 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
     }, [adapter, showAudit, entityId]);
 
     const cloneToDraft = useCallback<UseTreeSpecEditorActions['cloneToDraft']>(async () => {
-        if (!entityId || !adapter.cloneToDraft) return;
+        if (options.readOnly || !entityId || !adapter.cloneToDraft) return;
         setCloning(true);
         try {
             const { id: newId } = await adapter.cloneToDraft(entityId);
@@ -351,12 +372,14 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
         } finally {
             setCloning(false);
         }
-    }, [adapter, entityId, onCloneNavigate]);
+    }, [adapter, entityId, onCloneNavigate, options.readOnly]);
 
     return {
         loading,
         saving,
         saveConflict,
+        saveError,
+        failedSaveKey,
         publishing,
         setPublishing,
         creatingSnapshot,
