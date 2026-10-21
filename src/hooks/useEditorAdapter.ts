@@ -115,8 +115,8 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
     const [creatingSnapshot, setCreatingSnapshot] = useState(false);
     const [cloning, setCloning] = useState(false);
 
-    const validateRef = useRef<UseTreeSpecEditorActions['validate']>(async () => undefined);
-    const saveDraftRef = useRef<UseTreeSpecEditorActions['saveDraft']>(async () => undefined);
+    const validateRef = useRef<UseTreeSpecEditorActions['validate']>(() => Promise.resolve(undefined));
+    const saveDraftRef = useRef<UseTreeSpecEditorActions['saveDraft']>(() => Promise.resolve());
 
     const compiledTreeSpec = useMemo(
         () => (tree ? compileTreeSpec(tree) : null),
