@@ -1,0 +1,3 @@
+interface:
+  display_name: "React SOLID Principles"
+  short_description: "SOLID principles for React components and hooks"

@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 No unreleased changes recorded.
 
+## [0.3.2] - 2026-10-09
+
+### Changed
+
+- Depend on `@signalsafe/tree-spec` `^0.4.1` and `@signalsafe/tree-spec-editor-core` `^0.2.2` so consumers resolve a single copy of each.
+
 ## [0.3.1] - 2026-09-08
 
 ### Changed
