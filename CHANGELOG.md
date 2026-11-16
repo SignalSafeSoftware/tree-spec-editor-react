@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-No unreleased changes recorded.
+## [0.3.4] - 2026-11-15
+
+### Changed
+
+- Reconcile reviewed Vite and Playwright updates, regenerate the exact graph example SVG, and adopt verified current TreeSpec/editor-core maintenance dependencies.
+- Preserve current public types, read-only protections, save-failure behavior and stronger upstream quality gates; refresh current compatibility and release documentation.
 
 ## [0.3.3] - 2026-10-21
 

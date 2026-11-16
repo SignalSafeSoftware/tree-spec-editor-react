@@ -181,6 +181,6 @@ Save failures retain the local graph and saved baseline, clear `saving`, set exi
 
 ## Release and compatibility
 
-Release `0.3.3` preserves the installed Step 5 editor capabilities and the verified audit fixes. The coordinated dependency floor is TreeSpec `^0.4.4`, editor-core `^0.2.3`, and editor-react `^0.3.3` where declared. React integrations retain React 18 / React Flow 11. See [release preparation](./RELEASING.md) for verification and publication order. The coordinated release was approved on 2026-10-21; registry availability is recorded in release verification receipts.
+Release `0.3.4` is a compatible maintenance update over published `0.3.3`. It adopts verified current dependencies and reviewed tooling without changing the public authoring model or host responsibilities. React 18 / React Flow 11 support and current read-only/save-failure contracts remain. See [release preparation](./RELEASING.md) for exact quality, artifact and publication gates.
 
 See the [current release documentation](docs/current-release-candidate.md) for release-specific compatibility and verification boundaries.

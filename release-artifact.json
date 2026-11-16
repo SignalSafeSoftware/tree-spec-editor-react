@@ -1,7 +1,5 @@
 {
-  "name": "@signalsafe/tree-spec-editor-react",
-  "version": "0.3.3",
-  "sha256": "75d89c04f053648142b8d55c55214338bd2fabb4a3079718c025d68d6bf39bb8",
-  "approvalMatrixSha256": "ec40efa2930cd75832a7f75ad076bcea458f0f2a55933535b538a32296a01baf",
-  "sealedApprovedArchiveSha256": "22a653376d9e42ad275cf225b7f6eec4c6b60d6085fe5d812352e8da25d5ed1c"
+    "name": "@signalsafe/tree-spec-editor-react",
+    "version": "0.3.4",
+    "sha256": "0109c2b7808a3f6ae3de5a2ba1490c0bbcb46e8de20f109a550da1b78ed0e1ab"
 }
