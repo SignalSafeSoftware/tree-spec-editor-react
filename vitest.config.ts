@@ -32,6 +32,13 @@ export default defineConfig({
             exclude: ["src/**/*.d.ts"],
             reporter: ["text", "lcov"],
             reportsDirectory: "coverage",
+            thresholds: {
+                statements: 100,
+                branches: 100,
+                functions: 100,
+                lines: 100,
+                perFile: true,
+            },
         },
         server: {
             deps: {

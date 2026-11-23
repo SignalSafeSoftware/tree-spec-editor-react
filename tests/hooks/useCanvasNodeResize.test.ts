@@ -153,3 +153,28 @@ describe('useCanvasNodeResize', () => {
         unmount();
     });
 });
+
+it('commits a direct resize without inventing temporary-height state', async () => {
+    const previous = { unrelated: 100 };
+    const onChange = vi.fn();
+    const setResizeHeightByNodeId = vi.fn(
+        (update: React.SetStateAction<Record<string, number>>) => {
+            expect(typeof update === 'function' ? update(previous) : update).toBe(previous);
+        },
+    );
+    const h = await mountHook({
+        readOnly: false,
+        treeRef: { current: createTree() },
+        onChange,
+        setNodes: vi.fn(),
+        isResizingRef: { current: false },
+        resizeHeightByNodeId: {},
+        setResizeHeightByNodeId,
+    });
+    await act(async () => h.latest.current!.handleResizeNode('start', 301.6, 151.2));
+    expect(onChange.mock.calls[0]![0].nodes.start.render_hints.editor).toEqual({
+        width: 302,
+        height: 151,
+    });
+    h.unmount();
+});

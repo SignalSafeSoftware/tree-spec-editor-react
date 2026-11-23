@@ -66,7 +66,7 @@ export type UseEditorAdapterResult = {
     showPublishModal: boolean;
     setShowPublishModal: (next: boolean) => void;
     validate: UseTreeSpecEditorActions['validate'];
-    saveError: unknown | null;
+    saveError: unknown;
     failedSaveKey: string | null;
     saveDraft: UseTreeSpecEditorActions['saveDraft'];
     createSnapshot: UseTreeSpecEditorActions['createSnapshot'];
@@ -98,7 +98,7 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [saveError, setSaveError] = useState<unknown | null>(null);
+    const [saveError, setSaveError] = useState<unknown>(null);
     const [failedSaveKey, setFailedSaveKey] = useState<string | null>(null);
     const [saveConflict, setSaveConflict] = useState<TreeSpecSaveConflict | null>(null);
     const [publishing, setPublishing] = useState(false);
@@ -119,9 +119,6 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
     const [creatingSnapshot, setCreatingSnapshot] = useState(false);
     const [cloning, setCloning] = useState(false);
 
-    const validateRef = useRef<UseTreeSpecEditorActions['validate']>(() => Promise.resolve(undefined));
-    const saveDraftRef = useRef<UseTreeSpecEditorActions['saveDraft']>(() => Promise.resolve());
-
     const compiledTreeSpec = useMemo(
         () => (tree ? compileTreeSpec(tree) : null),
         [tree],
@@ -129,8 +126,7 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
 
     useEffect(() => {
         let cancelled = false;
-        async function load() {
-            if (!entityId) return;
+        async function load(entityId: string) {
             setLoading(true);
             setSaveError(null);
             setFailedSaveKey(null);
@@ -171,7 +167,7 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
                 if (!cancelled) setLoading(false);
             }
         }
-        if (entityId) void load();
+        if (entityId) void load(entityId);
         return () => {
             cancelled = true;
         };
@@ -239,6 +235,7 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
         [adapter, entityId, parseServerErrorMessage, rawTreeSpec, tree],
     );
 
+    const validateRef = useRef<UseTreeSpecEditorActions['validate']>(validate);
     useEffect(() => {
         validateRef.current = validate;
     }, [validate]);
@@ -289,6 +286,7 @@ export function useEditorAdapter(adapterOptions: UseEditorAdapterOptions): UseEd
         }
     }, [adapter, entityId, isPublished, rawTreeSpec, tree, lastSavedKeyRef, setAutosaveStatus, options.readOnly, options.onSaveError]);
 
+    const saveDraftRef = useRef<UseTreeSpecEditorActions['saveDraft']>(saveDraft);
     useEffect(() => {
         saveDraftRef.current = saveDraft;
     }, [saveDraft]);
