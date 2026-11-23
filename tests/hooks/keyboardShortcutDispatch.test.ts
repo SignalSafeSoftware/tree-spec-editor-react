@@ -192,3 +192,34 @@ describe('dispatchEditorKeyboardShortcut', () => {
         expect(action).toBe(KEYBOARD_SHORTCUT_ACTION.UNDO);
     });
 });
+
+it.each([KEYBOARD_SHORTCUT_ACTION.DUPLICATE, KEYBOARD_SHORTCUT_ACTION.DELETE])(
+    'ignores %s when no node or edge is selected',
+    (action) => {
+        const preventDefault = vi.fn();
+        const commitTree = vi.fn();
+        const deleteSelectedNode = vi.fn(() => false);
+        dispatchEditorKeyboardShortcut(
+            action,
+            { preventDefault },
+            {
+                tree: baseTree(),
+                selection: { kind: null, id: null },
+                isPublished: false,
+                undo: () => false,
+                redo: () => false,
+                copySelectedNode: () => false,
+                pasteCopiedNode: () => false,
+                deleteSelectedNode,
+                saveDraft: vi.fn(),
+                validate: vi.fn(),
+                commitTree,
+                setSelection: vi.fn(),
+                setFocusNodeId: vi.fn(),
+            },
+        );
+        expect(preventDefault).not.toHaveBeenCalled();
+        expect(commitTree).not.toHaveBeenCalled();
+        expect(deleteSelectedNode).not.toHaveBeenCalled();
+    },
+);

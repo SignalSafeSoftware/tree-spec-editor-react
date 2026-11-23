@@ -139,6 +139,7 @@ vi.mock('reactflow', () => {
             React.createElement('button', {
                 type: 'button',
                 'data-testid': 'node-resizer',
+                onPointerDown: () => props.onResizeStart?.({}, { width: 300, height: 150 }),
                 onClick: () => {
                     props.onResizeStart?.({}, { width: 300, height: 150 });
                     props.onResize?.();
@@ -1834,4 +1835,132 @@ describe('TreeSpecGraphEditor', () => {
             ).length,
         ).toBeGreaterThan(0);
     });
+});
+
+it('forwards canvas toolbar capabilities and safely omits host callbacks', async () => {
+    const onDuplicateNode = vi.fn();
+    const onDeleteNode = vi.fn();
+    await act(async () => {
+        renderer = TestRenderer.create(
+            React.createElement(TreeSpecGraphEditor, {
+                tree: createTree(),
+                onChange: vi.fn(),
+                selected: { kind: 'node', id: 'start' },
+                onDuplicateNode,
+                onDeleteNode,
+            }),
+        );
+    });
+    renderer!.root.findByProps({ 'aria-label': 'Duplicate node' }).props.onClick();
+    renderer!.root.findByProps({ 'aria-label': 'Delete node' }).props.onClick();
+    expect(onDuplicateNode).toHaveBeenCalledExactlyOnceWith('start');
+    expect(onDeleteNode).toHaveBeenCalledExactlyOnceWith('start');
+    await act(async () =>
+        renderer!.update(
+            React.createElement(TreeSpecGraphEditor, {
+                tree: createTree(),
+                onChange: vi.fn(),
+                selected: { kind: 'node', id: 'start' },
+            }),
+        ),
+    );
+    expect(() => {
+        renderer!.root.findByProps({ 'aria-label': 'Duplicate node' }).props.onClick();
+        renderer!.root.findByProps({ 'aria-label': 'Delete node' }).props.onClick();
+    }).not.toThrow();
+});
+
+it('keeps resize-local geometry while incoming graph state is deferred and ignores suppressed viewport writes', async () => {
+    const onChange = vi.fn();
+    const tree = createTree();
+    await act(async () => {
+        renderer = TestRenderer.create(
+            React.createElement(TreeSpecGraphEditor, {
+                tree,
+                onChange,
+                selected: { kind: 'node', id: 'start' },
+            }),
+        );
+    });
+    onChange.mockClear();
+    await act(async () =>
+        renderer!.root.findAllByProps({ 'data-testid': 'node-resizer' })[0]!.props.onPointerDown(),
+    );
+    const changed = {
+        ...tree,
+        nodes: { ...tree.nodes, start: { ...tree.nodes.start, prompt: 'Incoming revision' } },
+    };
+    await act(async () =>
+        renderer!.update(
+            React.createElement(TreeSpecGraphEditor, {
+                tree: changed,
+                onChange,
+                selected: { kind: 'node', id: 'start' },
+            }),
+        ),
+    );
+    expect(
+        reactFlowState.latestProps.nodes.find((node: { id: string }) => node.id === 'start').data
+            .node.prompt,
+    ).toBe(tree.nodes.start.prompt);
+    expect(onChange).not.toHaveBeenCalled();
+});
+
+it('rejects touch drops without coordinates and without a valid source choice', async () => {
+    const onChange = vi.fn();
+    await act(async () => {
+        renderer = TestRenderer.create(
+            React.createElement(TreeSpecGraphEditor, { tree: createTree(), onChange }),
+        );
+    });
+    const target = { classList: { contains: (name: string) => name === 'react-flow__pane' } };
+    reactFlowState.latestProps.onConnectStart({}, { nodeId: 'start', handleId: 'choice:c1' });
+    reactFlowState.latestProps.onConnectEnd({ changedTouches: [], target });
+    reactFlowState.latestProps.onConnectStart({}, { nodeId: 'start', handleId: 'choice:missing' });
+    reactFlowState.latestProps.onConnectEnd({
+        changedTouches: [{ clientX: 10, clientY: 20 }],
+        target,
+    });
+    expect(onChange).not.toHaveBeenCalled();
+});
+
+it('retains locked node positions and existing metadata if the END canvas node is removed', async () => {
+    const graph = createTree();
+    graph.nodes.start.render_hints = { editor: { locked: true, height: 180 } };
+    const onChange = vi.fn();
+    await act(async () => {
+        renderer = TestRenderer.create(
+            React.createElement(TreeSpecGraphEditor, { tree: graph, onChange }),
+        );
+    });
+    expect(
+        reactFlowState.latestProps.nodes.find((node: { id: string }) => node.id === 'start').style
+            .height,
+    ).toBe(180);
+    await act(async () => {
+        reactFlowState.latestProps.onNodesChange([
+            { id: END_NODE_ID, type: 'remove' },
+            { id: 'start', type: 'position', position: { x: 999, y: 999 } },
+        ]);
+    });
+    await flushMicrotasks();
+    expect(onChange.mock.calls.at(-1)![0].nodes.start.position).toEqual(graph.nodes.start.position);
+    expect(onChange.mock.calls.at(-1)![0]._meta).toBe(graph._meta);
+});
+
+it('suppresses viewport persistence until initial canvas geometry settles', async () => {
+    vi.useFakeTimers();
+    const onChange = vi.fn();
+    await act(async () => {
+        renderer = TestRenderer.create(
+            React.createElement(TreeSpecGraphEditor, { tree: createTree(), onChange }),
+        );
+    });
+    act(() => reactFlowState.latestProps.onMoveEnd({}, { x: 99, y: 99, zoom: 0.5 }));
+    expect(onChange).not.toHaveBeenCalled();
+    await act(async () => {
+        await vi.advanceTimersByTimeAsync(1);
+    });
+    act(() => reactFlowState.latestProps.onMoveEnd({}, { x: 99, y: 99, zoom: 0.5 }));
+    expect(onChange).toHaveBeenCalledTimes(1);
 });

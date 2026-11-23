@@ -1,4 +1,4 @@
-import { useEffect, useRef, type MutableRefObject, type RefObject } from 'react';
+import { useEffect, type MutableRefObject, type RefObject } from 'react';
 
 import { compileTreeSpec } from '@signalsafe/tree-spec';
 
@@ -37,8 +37,6 @@ export function useEditorAutosave(options: UseEditorAutosaveOptions): void {
         saveDraftRef,
     } = options;
 
-    const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
     useEffect(() => {
         if (!enableAutosave) return;
         if (!entityId || !tree) return;
@@ -54,15 +52,10 @@ export function useEditorAutosave(options: UseEditorAutosaveOptions): void {
             return;
         }
         setAutosaveStatus(AUTOSAVE_STATUS.DIRTY);
-        autosaveTimerRef.current = globalThis.setTimeout(() => {
+        const timer = globalThis.setTimeout(() => {
             void saveDraftRef.current?.();
         }, autosaveDebounceMs);
-        return () => {
-            if (autosaveTimerRef.current) {
-                globalThis.clearTimeout(autosaveTimerRef.current);
-                autosaveTimerRef.current = null;
-            }
-        };
+        return () => globalThis.clearTimeout(timer);
         // NOTE: autosaveStatus is intentionally NOT in deps. The dirty/idle
         // bookkeeping above flips status, and re-running the effect on every
         // status change would reset the debounce timer.

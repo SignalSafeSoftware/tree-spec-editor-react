@@ -275,16 +275,16 @@ export function useTreeSpecEditor(options: UseTreeSpecEditorOptions): UseTreeSpe
 
             if (defaultLabel) {
                 const node = next.nodes[selectedNode.id];
-                if (node) {
-                    const choices = (node.choices ?? []).map((choice) => {
-                        if (choice.id !== typeId) return choice;
-                        if (choice.label === 'New choice' || !choice.label.trim()) {
-                            return { ...choice, label: defaultLabel };
-                        }
-                        return choice;
-                    });
-                    next.nodes[selectedNode.id] = { ...node, choices };
-                }
+                // A successful rename constructs this node and its concrete choices array.
+                const renamedChoices = node.choices as EditorChoice[];
+                const choices = renamedChoices.map((choice) => {
+                    if (choice.id !== typeId) return choice;
+                    if (choice.label === 'New choice' || !choice.label.trim()) {
+                        return { ...choice, label: defaultLabel };
+                    }
+                    return choice;
+                });
+                next.nodes[selectedNode.id] = { ...node, choices };
             }
 
             commitTree(next);

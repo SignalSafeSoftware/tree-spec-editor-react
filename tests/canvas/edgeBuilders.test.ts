@@ -155,3 +155,27 @@ describe('edgeBuilders', () => {
         ]);
     });
 });
+
+it('defaults a newly drawn terminal edge to at risk without inventing a previous outcome', () => {
+    expect(
+        buildTransitionsFromEdges(
+            [
+                {
+                    id: 'new',
+                    source: 'n1',
+                    target: END_NODE_ID,
+                    sourceHandle: `${CHOICE_HANDLE_PREFIX}c1`,
+                },
+            ],
+            [],
+        ),
+    ).toEqual([
+        {
+            id: 'new',
+            fromNodeId: 'n1',
+            fromChoiceId: 'c1',
+            toNodeId: END_NODE_ID,
+            outcome: 'at_risk',
+        },
+    ]);
+});

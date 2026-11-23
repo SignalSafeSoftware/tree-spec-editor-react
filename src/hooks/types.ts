@@ -203,7 +203,7 @@ export interface UseTreeSpecEditorState {
     /** Typed revision conflict from an opt-in adapter save contract, if any. */
     saveConflict: TreeSpecSaveConflict | null;
     /** Last save failure; null before a save attempt or after success/conflict. */
-    saveError: unknown | null;
+    saveError: unknown;
     /** A `Publish` round-trip is in flight. */
     publishing: boolean;
     /** A `Snapshot` round-trip is in flight. */

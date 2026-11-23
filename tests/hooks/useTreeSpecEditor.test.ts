@@ -11,6 +11,7 @@ import type {
 import * as treeSpec from '@signalsafe/tree-spec';
 import {
     AUTOSAVE_STATUS,
+    coerceTreeSpecWireForEditor,
     END_NODE_ID,
     GRAPH_SELECTION_KIND,
     type TreeTemplateSpec,
@@ -1810,4 +1811,359 @@ describe('nonblocking error observer', () => {
         expect(hook.latest.current!.saveError).toBeInstanceOf(Error);
         hook.unmount();
     });
+});
+
+describe('authored draft and async lifecycle boundaries', () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+        vi.unstubAllGlobals();
+    });
+
+    it('keeps the currently loaded definition when an earlier load resolves or rejects after target change', async () => {
+        const first =
+            Promise.withResolvers<Awaited<ReturnType<TreeSpecEditorAdapter['getVersion']>>>();
+        const second =
+            Promise.withResolvers<Awaited<ReturnType<TreeSpecEditorAdapter['getVersion']>>>();
+        const adapter = buildAdapter({
+            getVersion: vi
+                .fn()
+                .mockReturnValueOnce(first.promise)
+                .mockReturnValueOnce(second.promise)
+                .mockResolvedValue({ tree_spec: buildSampleWire(), is_published: false }),
+        });
+        const h = await mountHook({ adapter, entityId: 'old' });
+        await h.rerender({ adapter, entityId: 'second' });
+        await act(async () => first.resolve({ tree_spec: buildSampleWire(), is_published: true }));
+        expect(h.latest.current!.loading).toBe(true);
+        expect(h.latest.current!.tree).toBeNull();
+        await h.rerender({ adapter, entityId: 'current' });
+        await act(async () => second.reject(new Error('stale offline response')));
+        expect(h.latest.current!.loading).toBe(false);
+        expect(h.latest.current!.tree!.nodes.n1).toBeDefined();
+        expect(h.latest.current!.isPublished).toBe(false);
+        h.unmount();
+    });
+
+    it('uses documented empty, level and fallback validation diagnostics', async () => {
+        const validate = vi
+            .fn<NonNullable<TreeSpecEditorAdapter['validate']>>()
+            .mockResolvedValueOnce({
+                valid: false,
+                issues: [{ level: 'warning' }, {}, { severity: 'info', message: 'Information' }],
+            })
+            .mockRejectedValueOnce({ response: { data: { error: 'service error' } } })
+            .mockRejectedValueOnce(null);
+        const adapter = buildAdapter({ validate });
+        const h = await mountHook({
+            adapter,
+            entityId: 'v1',
+            shouldQueueInitialValidation: () => false,
+            parseServerErrorMessage: () => null,
+        });
+        await act(async () => {
+            await h.latest.current!.actions.validate();
+        });
+        expect(h.latest.current!.serverIssues).toEqual([
+            { severity: 'warning', message: 'Issue', node_id: undefined, choice_id: undefined },
+            { severity: 'error', message: 'Issue', node_id: undefined, choice_id: undefined },
+            { severity: 'info', message: 'Information', node_id: undefined, choice_id: undefined },
+        ]);
+        await act(async () => {
+            await h.latest.current!.actions.validate();
+        });
+        expect(h.latest.current!.serverIssues[0]!.message).toBe('service error');
+        await act(async () => {
+            await h.latest.current!.actions.validate();
+        });
+        expect(h.latest.current!.serverIssues[0]!.message).toBe('Validation failed');
+        h.unmount();
+    });
+
+    it('ignores late snapshot and audit lists after their panels close', async () => {
+        const snapshots =
+            Promise.withResolvers<
+                Awaited<ReturnType<NonNullable<TreeSpecEditorAdapter['listSnapshots']>>>
+            >();
+        const audit =
+            Promise.withResolvers<
+                Awaited<ReturnType<NonNullable<TreeSpecEditorAdapter['listAudit']>>>
+            >();
+        const adapter = buildAdapter({
+            listSnapshots: () => snapshots.promise,
+            listAudit: () => audit.promise,
+        });
+        const h = await mountHook({ adapter, entityId: 'v1' });
+        await act(async () => {
+            h.latest.current!.actions.setShowDraftHistory(true);
+            h.latest.current!.actions.setShowAudit(true);
+        });
+        expect(h.latest.current!.loadingSnapshots).toBe(true);
+        expect(h.latest.current!.loadingAudit).toBe(true);
+        await act(async () => {
+            h.latest.current!.actions.setShowDraftHistory(false);
+            h.latest.current!.actions.setShowAudit(false);
+        });
+        await act(async () => {
+            snapshots.resolve([]);
+            audit.resolve([]);
+        });
+        expect(h.latest.current!.snapshots).toEqual([]);
+        expect(h.latest.current!.auditEvents).toEqual([]);
+        h.unmount();
+    });
+
+    it('contains a synchronous error observer and rejects invalid restore and empty clone identities', async () => {
+        const onSaveError = vi.fn(() => {
+            throw new Error('observer');
+        });
+        const adapter = buildAdapter({
+            updateVersion: vi.fn().mockRejectedValue('offline'),
+            restoreSnapshot: async () => ({ tree_spec: {} }),
+            cloneToDraft: async () => ({ id: '' }),
+        });
+        const coerceRawSpec = (raw: unknown) =>
+            raw && typeof raw === 'object' && Reflect.has(raw, 'wire_version')
+                ? coerceTreeSpecWireForEditor(raw)
+                : null;
+        const h = await mountHook({
+            adapter,
+            entityId: 'v1',
+            coerceRawSpec,
+            onSaveError,
+            enableAutosave: false,
+        });
+        const original = h.latest.current!.tree;
+        await act(async () => {
+            await h.latest.current!.actions.saveDraft();
+            await h.latest.current!.actions.restoreSnapshot('invalid');
+            await h.latest.current!.actions.cloneToDraft();
+        });
+        expect(h.latest.current!.tree).toBe(original);
+        expect(h.latest.current!.saveError).toBe('offline');
+        expect(h.latest.current!.saving).toBe(false);
+        expect(h.latest.current!.restoringSnapshotId).toBeNull();
+        expect(h.latest.current!.cloning).toBe(false);
+        expect(onSaveError).toHaveBeenCalledExactlyOnceWith('offline');
+        h.unmount();
+    });
+
+    it('preserves authored labels and ignores invalid graph operations without mutating the draft', async () => {
+        const h = await mountHook({
+            adapter: buildAdapter(),
+            entityId: 'v1',
+            enableAutosave: false,
+        });
+        await act(async () => h.latest.current!.actions.selectChoice('n1', 'c1'));
+        await act(async () =>
+            h.latest.current!.actions.setChoiceType('missing', 'next', 'Default'),
+        );
+        expect(h.latest.current!.tree!.nodes.n1!.choices![0]!.id).toBe('c1');
+        await act(async () => h.latest.current!.actions.setChoiceType('c1', 'next', 'Default'));
+        expect(h.latest.current!.tree!.nodes.n1!.choices![0]!.label).toBe('A');
+        expect(h.latest.current!.focusChoiceId).toBe('next');
+        const renamed = h.latest.current!.tree;
+        await act(async () => {
+            h.latest.current!.actions.repositionChoice('n1', 'missing', 'n1', 0);
+            h.latest.current!.actions.updateChoiceEdgeHints('missing', 'next', {});
+            h.latest.current!.actions.setChoiceOutcome('missing', 'safe');
+        });
+        expect(h.latest.current!.tree).toBe(renamed);
+        await act(async () => h.latest.current!.actions.setChoiceTarget('next', END_NODE_ID));
+        const terminal = h.latest.current!.tree;
+        await act(async () =>
+            h.latest.current!.actions.setChoiceOutcome('next', 'unknown' as never),
+        );
+        expect(h.latest.current!.tree).toBe(terminal);
+        await act(async () => h.latest.current!.actions.setChoiceTarget('next', 'n1'));
+        const nonterminal = h.latest.current!.tree;
+        await act(async () => h.latest.current!.actions.setChoiceOutcome('next', 'safe'));
+        expect(h.latest.current!.tree).toBe(nonterminal);
+        expect(h.latest.current!.actions.deleteNodeById('missing')).toBe(false);
+        await act(async () => h.latest.current!.actions.setSelection({ kind: null, id: null }));
+        expect(h.latest.current!.actions.deleteSelectedNode()).toBe(false);
+        await act(async () => h.latest.current!.actions.setTree(null));
+        await act(async () => {
+            h.latest.current!.actions.insertTemplate({ nodes: {}, transitions: [], focusSlot: '' });
+            h.latest.current!.actions.repositionChoice('n1', 'next', 'n1', 0);
+            h.latest.current!.actions.updateChoiceEdgeHints('n1', 'next', {});
+            h.latest.current!.actions.setDefaultEdgeType('smoothstep');
+        });
+        expect(h.latest.current!.tree).toBeNull();
+        h.unmount();
+    });
+});
+
+it('does not publish a locally invalid definition even if server validation accepts it', async () => {
+    const adapter = buildAdapter({ validate: async () => ({ valid: true }), publish: vi.fn() });
+    const h = await mountHook({ adapter, entityId: 'v1', enableAutosave: false });
+    const graph = h.latest.current!.tree!;
+    await act(async () => h.latest.current!.actions.setTree({ ...graph, start_node: 'missing' }));
+    expect(h.latest.current!.canPublish).toBe(false);
+    await act(async () => {
+        await h.latest.current!.actions.publish();
+    });
+    expect(adapter.publish).not.toHaveBeenCalled();
+    expect(h.latest.current!.publishing).toBe(false);
+    h.unmount();
+});
+
+it('deduplicates identical host runtime issues while retaining distinct severities', async () => {
+    const issue = {
+        severity: 'warning' as const,
+        message: 'Repeated',
+        node_id: 'n1',
+        choice_id: 'c1',
+    };
+    const h = await mountHook({
+        adapter: buildAdapter(),
+        entityId: 'v1',
+        computeRuntimeIssues: () => [issue, issue, { ...issue, severity: 'info' }],
+    });
+    expect(h.latest.current!.issues.filter((item) => item.message === 'Repeated')).toEqual([
+        issue,
+        { ...issue, severity: 'info' },
+    ]);
+    h.unmount();
+});
+
+it('keeps empty authored choices safe when choice actions are called from a JavaScript draft', async () => {
+    const h = await mountHook({ adapter: buildAdapter(), entityId: 'v1', enableAutosave: false });
+    const graph = h.latest.current!.tree!;
+    Reflect.deleteProperty(graph.nodes.n1!, 'choices');
+    await act(async () => h.latest.current!.actions.setTree({ ...graph }));
+    await act(async () =>
+        h.latest.current!.actions.setSelection({ kind: GRAPH_SELECTION_KIND.NODE, id: 'n1' }),
+    );
+    await act(async () => h.latest.current!.actions.moveChoice('missing', 'up'));
+    await act(async () => h.latest.current!.actions.deleteChoice('missing'));
+    expect(h.latest.current!.tree!.nodes.n1!.choices).toEqual([]);
+    Reflect.deleteProperty(h.latest.current!.tree!.nodes.n1!, 'choices');
+    await act(async () => h.latest.current!.actions.updateChoiceEdgeHints('n1', 'missing', {}));
+    expect(h.latest.current!.tree!.nodes.n1!.choices).toEqual([]);
+    Reflect.deleteProperty(h.latest.current!.tree!.nodes.n1!, 'choices');
+    await act(async () => h.latest.current!.actions.addChoice());
+    expect(h.latest.current!.tree!.nodes.n1!.choices).toHaveLength(1);
+    h.unmount();
+});
+
+it('normalizes blank labels on rename while preserving other authored choices', async () => {
+    const h = await mountHook({ adapter: buildAdapter(), entityId: 'v1', enableAutosave: false });
+    const graph = h.latest.current!.tree!;
+    await act(async () =>
+        h.latest.current!.actions.setTree({
+            ...graph,
+            nodes: {
+                ...graph.nodes,
+                n1: {
+                    ...graph.nodes.n1!,
+                    choices: [
+                        { id: 'c1', label: '   ' },
+                        { id: 'other', label: 'Keep' },
+                    ],
+                },
+            },
+        }),
+    );
+    await act(async () => h.latest.current!.actions.selectChoice('n1', 'c1'));
+    await act(async () => h.latest.current!.actions.setChoiceType('c1', 'renamed', 'Default'));
+    expect(h.latest.current!.tree!.nodes.n1!.choices).toEqual([
+        { id: 'renamed', label: 'Default' },
+        { id: 'other', label: 'Keep' },
+    ]);
+    h.unmount();
+});
+
+it('contains malformed JavaScript adapter responses without inventing server issues or clearing a previous conflict', async () => {
+    const adapter = buildAdapter({
+        saveVersion: async () => ({ status: 'conflict', remoteTreeSpec: buildSampleWire() }),
+    });
+    Reflect.set(adapter, 'validate', async () => undefined);
+    const h = await mountHook({ adapter, entityId: 'v1', enableAutosave: false });
+    expect(h.latest.current!.serverIssues).toEqual([]);
+    await act(async () => {
+        await h.latest.current!.actions.saveDraft();
+    });
+    const conflict = h.latest.current!.saveConflict;
+    Reflect.set(adapter, 'saveVersion', async () => ({ status: 'unexpected' }));
+    await act(async () => {
+        await h.latest.current!.actions.saveDraft();
+    });
+    expect(h.latest.current!.saveConflict).toBe(conflict);
+    Reflect.set(adapter, 'validate', async () => {
+        throw { response: {} };
+    });
+    await act(async () => {
+        await h.latest.current!.actions.validate();
+    });
+    expect(h.latest.current!.serverIssues[0]!.message).toBe('Validation failed');
+    h.unmount();
+});
+
+it('supports adapters that deliberately reject a missing definition without bootstrapping it', async () => {
+    const adapter = buildAdapter({ getVersion: async () => null });
+    const h = await mountHook({ adapter, entityId: 'v1', coerceRawSpec: () => null });
+    expect(h.latest.current!.loading).toBe(false);
+    expect(h.latest.current!.tree).toBeNull();
+    expect(h.latest.current!.versionInfo).toBeNull();
+    await expect(h.latest.current!.actions.validate()).resolves.toBeUndefined();
+    h.unmount();
+});
+
+it('loads saved positions without relayout and preserves unrelated choices during edge hint updates', async () => {
+    const graph = treeSpec.decompileTreeSpec(coerceTreeSpecWireForEditor(buildSampleWire())!);
+    graph.nodes.n1!.position = { x: 160, y: 240 };
+    graph.nodes.n1!.choices!.push({ id: 'other', label: 'Keep' });
+    const saved = treeSpec.compileTreeSpec(graph);
+    const h = await mountHook({
+        adapter: buildAdapter({
+            getVersion: async () => ({ tree_spec: saved, is_published: false }),
+        }),
+        entityId: 'v1',
+        enableAutosave: false,
+        enableKeyboardShortcuts: false,
+    });
+    expect(h.latest.current!.tree!.nodes.n1!.position).toEqual({ x: 160, y: 240 });
+    await act(async () =>
+        h.latest.current!.actions.updateChoiceEdgeHints('n1', 'c1', { showLabel: false }),
+    );
+    expect(h.latest.current!.tree!.nodes.n1!.choices![1]).toEqual({ id: 'other', label: 'Keep' });
+    await act(async () => h.latest.current!.actions.selectChoice('n1', 'c1'));
+    await act(async () => h.latest.current!.actions.setChoiceType('c1', 'renamed'));
+    expect(h.latest.current!.tree!.nodes.n1!.choices![0]!.id).toBe('renamed');
+    h.unmount();
+});
+
+it('leaves browser shortcuts alone inside a contenteditable element', async () => {
+    class EditableElement {
+        tagName = 'DIV';
+        getAttribute(name: string) {
+            return name === 'contenteditable' ? 'true' : null;
+        }
+    }
+    const listeners = new Set<EventListener>();
+    vi.stubGlobal('HTMLElement', EditableElement);
+    vi.stubGlobal('addEventListener', (_name: string, listener: EventListener) =>
+        listeners.add(listener),
+    );
+    vi.stubGlobal('removeEventListener', (_name: string, listener: EventListener) =>
+        listeners.delete(listener),
+    );
+    const adapter = buildAdapter();
+    try {
+        const h = await mountHook({ adapter, entityId: 'v1' });
+        const event = new Event('keydown', { cancelable: true });
+        Object.defineProperties(event, {
+            key: { value: 's' },
+            ctrlKey: { value: true },
+            metaKey: { value: false },
+            shiftKey: { value: false },
+            target: { value: new EditableElement() },
+        });
+        act(() => listeners.forEach((listener) => listener(event)));
+        expect(event.defaultPrevented).toBe(false);
+        expect(adapter.updateVersion).not.toHaveBeenCalled();
+        h.unmount();
+    } finally {
+        vi.unstubAllGlobals();
+    }
 });

@@ -65,8 +65,9 @@ export function useEditorSelection(tree: EditorTree | null): UseEditorSelectionR
     }, [tree, selection]);
 
     const inspectorNode = useMemo<EditorNode | null>(() => {
+        if (!tree) return null;
         if (selectedNode) return selectedNode;
-        if (selectedEdge) return tree?.nodes[selectedEdge.fromNodeId] ?? null;
+        if (selectedEdge) return tree.nodes[selectedEdge.fromNodeId] ?? null;
         return null;
     }, [selectedNode, selectedEdge, tree]);
 
