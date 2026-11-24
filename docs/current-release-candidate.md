@@ -1,4 +1,20 @@
-# Release candidate: @signalsafe/tree-spec-editor-react 0.3.4
+# Current npm release: @signalsafe/tree-spec-editor-react 0.3.5
+
+The trusted-publishing migration prepares patch `0.3.5` under immutable
+GitHub tag `v0.3.5`. Current release and authentication instructions are in
+[RELEASING.md](../RELEASING.md); the migration uses GitHub Actions OIDC rather than
+a permanent npm publishing token. Runtime exports and dependency ranges are
+unchanged by this patch. Host adoption and Python releases remain independent.
+
+The release workflow is the source of publication evidence. This documentation
+follow-up does not reseal or republish an immutable package archive or move a tag.
+
+## Historical release and state record
+
+The previous snapshot below is retained for context; its version and publication
+status statements apply to that earlier snapshot.
+
+### Release candidate: @signalsafe/tree-spec-editor-react 0.3.4
 
 The published baseline is 0.3.3. Reconcile reviewed Vite and Playwright updates, regenerate the exact graph example SVG, and adopt verified current TreeSpec/editor-core maintenance dependencies. Existing public exports and runtime behavior remain compatible. The source was reconciled with current remote refactors and additional regression tests while preserving original uncommitted work separately.
 
