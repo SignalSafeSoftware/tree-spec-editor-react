@@ -1,5 +1,10 @@
 # @signalsafe/tree-spec-editor-react
 
+[![Build](https://github.com/SignalSafeSoftware/tree-spec-editor-react/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/SignalSafeSoftware/tree-spec-editor-react/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/@signalsafe/tree-spec-editor-react?logo=npm)](https://www.npmjs.com/package/@signalsafe/tree-spec-editor-react)
+[![npm downloads per month](https://img.shields.io/npm/dm/@signalsafe/tree-spec-editor-react?label=downloads%2Fmonth)](https://www.npmjs.com/package/@signalsafe/tree-spec-editor-react)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/SignalSafeSoftware/tree-spec-editor-react/blob/main/LICENSE)
+
 Current source and planned customer-subdomain impact: [current-state summary](docs/current-release-candidate.md).
 
 Headless **React + React Flow** layer for the SignalSafe TreeSpec graph editor: canvas component, orchestration hook, and wiring to `@signalsafe/tree-spec-editor-core`.
