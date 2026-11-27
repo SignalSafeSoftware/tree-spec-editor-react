@@ -253,9 +253,9 @@
   integrity sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==
 
 "@signalsafe/tree-spec-editor-core@^0.2.4":
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/@signalsafe/tree-spec-editor-core/-/tree-spec-editor-core-0.2.4.tgz#78e0f24f9815e94e27d62e2c62242787fe57af05"
-  integrity sha512-KrEI9NkYMEFjr1Lk6KJ+gEdTUqL9s9Gx2p7aivH+d4c8c4G82Scik+RyhJ3OCrm4QnVduD4FAG+IlL9HtsAKHw==
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/@signalsafe/tree-spec-editor-core/-/tree-spec-editor-core-0.2.5.tgz#cbe3d62b3a12098a49e5a886da4c894153d0d91f"
+  integrity sha512-mX7pv33xryKWpU3EAVV+nSV1ouLqyzrLVnPrHt8IqHEl4cj608NbtEEX5Oy6kaAH5k5vGj2p6F+Q1QtoE/79dg==
   dependencies:
     "@signalsafe/tree-spec" "^0.4.5"
     dagre "^0.8.5"
